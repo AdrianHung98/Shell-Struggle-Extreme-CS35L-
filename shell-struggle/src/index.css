@@ -11,8 +11,3 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
-
-.TurtleDisplay {
-  border: 1px solid seagreen;
-  width: 200px;
-}

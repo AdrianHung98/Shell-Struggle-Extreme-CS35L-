@@ -1,0 +1,9 @@
+
+.redirect_button {
+    border: none;
+    background-color: teal;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    width: 150px;
+}
