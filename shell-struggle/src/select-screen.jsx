@@ -1,15 +1,8 @@
-import React from 'react';
-import './turtle.css'
-import Turtle from './turtle.jsx';
-import './select-screen.css'
+// select-screen.jsx
 
-const turtle = <Turtle 
-  class='scientist' 
-  attack_stat='5'
-  wisdom_stat='10'
-  speed_stat='5'
-  image='https://cdn.drawception.com/images/panels/2017/5-8/SSFCdOc9BN-2.png'
-/>
+import React from 'react';
+import './select-screen.css'
+import GameCycle from './gameCycle';
 
 function RedirectButton(props) {
     return(
@@ -26,9 +19,11 @@ class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            current_page: "main"
+            current_page: "main",
+            isLoggedIn: false
         }
     };
+
 
     renderRedirectButton(pageName) {
         return(
@@ -71,8 +66,7 @@ class App extends React.Component {
         if (pageName === "game") {
             return(
                 <div>
-                    This is a holding page for the game. Here's a fun turtle:
-                    <div>{turtle}</div>
+                    <GameCycle/>
                     <div>{this.renderRedirectButton("main")}</div>
                 </div> 
             );
