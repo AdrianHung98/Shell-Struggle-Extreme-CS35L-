@@ -1,8 +1,8 @@
 // gameCycle.jsx
 
 import React from 'react';
-import Turtle from './turtle.jsx';
-import './turtle.css';
+import Turtle from '../turtle.jsx';
+import '../turtle.css';
 
 const turtle = <Turtle 
   class='scientist' 
