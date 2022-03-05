@@ -8,7 +8,10 @@ import 'firebase/compat/auth';
 const config = {
   apiKey: 'AIzaSyBwWESvYJgPkQ6DZbz4Vhsg_yfcc0nmOlA',
   authDomain: 'shell-struggle-extreme.firebaseapp.com',
-  // ...
+  projectId: "shell-struggle-extreme",
+  storageBucket: "shell-struggle-extreme.appspot.com",
+  messagingSenderId: "363004396843",
+  appId: "1:363004396843:web:7c4a156645c98832a9716e"
 };
 firebase.initializeApp(config);
 
@@ -27,7 +30,7 @@ const uiConfig = {
 function SignInScreen() {
   return (
     <div>
-      <h1>My App</h1>
+      <h1>Shell Struggle Extreme</h1>
       <p>Please sign-in:</p>
       <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebase.auth()} />
     </div>
