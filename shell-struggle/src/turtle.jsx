@@ -13,6 +13,7 @@ function Turtle(props) {
                 src={props.image} 
                 width="42"
                 height="42"
+                alt=""
                 />
         </div>
     );
