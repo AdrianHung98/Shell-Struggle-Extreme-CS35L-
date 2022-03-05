@@ -5,6 +5,7 @@ import './index.css';
 import SignInScreen from './sign-in-screen';
 import App from './routes/select-screen';
 import GameCycle from './routes/game-cycle.jsx';
+import './database'
 
 ReactDOM.render(
   <BrowserRouter>
