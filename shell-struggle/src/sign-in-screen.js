@@ -1,6 +1,6 @@
 // Import FirebaseAuth and firebase.
 import React from 'react';
-import {firebase} from "./firebase"
+import { firebase } from "./firebase"
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 
 // Configure FirebaseUI.
@@ -21,6 +21,7 @@ function SignInScreen() {
       <h1>Shell Struggle Extreme</h1>
       <p>Please sign-in:</p>
       <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebase.auth()} />
+      <></>
     </div>
   );
 }

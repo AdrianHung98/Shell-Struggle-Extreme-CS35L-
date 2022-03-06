@@ -3,6 +3,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import './select-screen.css';
+import SignOutButton from '../sign-out-button';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
       >
         <Link to="/gameCycle">Game Cycle</Link>
       </nav>
+      <SignOutButton/>
     </div>
   );
 }
