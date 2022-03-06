@@ -11,11 +11,20 @@ function App() {
       <h1>Pages:</h1>
       <nav
         style={{
-          borderBottom: "solid 1px",
-          paddingBottom: "1rem",
+          borderbottom: "solid 1px",
+          paddingbottom: "1rem",
         }}
       >
         <Link to="/gameCycle">Game Cycle</Link>
+      </nav>
+
+      <nav
+        style={{
+          borderbottom: "solid 1px",
+          paddingbottom: "1rem",
+        }}
+      >
+        <Link to="/bestiary">Bestiary</Link>
       </nav>
       <SignOutButton/>
     </div>
