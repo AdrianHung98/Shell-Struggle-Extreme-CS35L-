@@ -1,5 +1,22 @@
 import { firestore } from "./firebase";
-import { doc, updateDoc, getDoc } from "firebase/firestore"
+import { collection, doc, updateDoc, getDoc, getDocs, setDoc } from "firebase/firestore"
+
+async function getTurtleClasses() {
+  const img = 'https://images.squarespace-cdn.com/content/v1/5369465be4b0507a1fd05af0/1528837069483-LD1R6EJDDHBY8LBPVHIU/randall-ruiz-272502.jpg';
+  const testTurtleClass = {
+    turtleClass: 'Scientist', 
+    testStat: 20, 
+    testLore: 'hi', 
+    testImg: img
+  };
+  await setDoc(doc(firestore, 'turtleClasses', 'testTurtle'), testTurtleClass);
+  const turtleClassesCollectionRef = collection(firestore, 'turtleClasses');
+  const turtleClassesSnapshot = await getDocs(turtleClassesCollectionRef);
+  let turtleClasses = [];
+  turtleClassesSnapshot.forEach(turtleClass => turtleClasses.push(turtleClass.data()));
+  console.log('hi');
+  return turtleClasses;
+}
 
 async function getUserRef (username) {
     const userpath = 'users/' + username;
@@ -91,5 +108,5 @@ async function setName(user, index, name) {
     }    
 }
 
-export { getTurtles, unlockTurtle, getWallet, incWallet, getNames, setName }
+export { getTurtleClasses, getTurtles, unlockTurtle, getWallet, incWallet, getNames, setName }
 

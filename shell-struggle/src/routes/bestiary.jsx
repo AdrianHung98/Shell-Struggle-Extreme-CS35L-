@@ -18,6 +18,7 @@ import {
   MDBIcon
 } from 'mdb-react-ui-kit';
 import 'mdb-react-ui-kit/dist/css/mdb.min.css'
+import { getTurtleClasses } from '../database';
 
 /**
  * see: 
@@ -121,8 +122,9 @@ function temp_header() {
   );
 }
 
+/* 
 function make_card(turtle) {
-  {/* currently causes duplicate keys but shouldnt matter later */}
+  // currently causes duplicate keys but shouldnt matter later
   return (
     <MDBCol lg={true} style={{marginBottom: '1.5rem'}} className='col-3' key={turtle}>
       <MDBCard style={{ width: '18rem' }} className='h-100'>
@@ -140,10 +142,39 @@ function make_card(turtle) {
     </MDBCol>
   );
 }
+*/
+
+function make_card(turtle) {
+  return (
+    <MDBCol lg={true} style={{marginBottom: '1.5rem'}} className='col-3' key={turtle}>
+      <MDBCard style={{ width: '18rem' }} className='h-100'>
+        <MDBCardImage position='top' src={turtle.testImg} />
+        <MDBCardBody>
+          <MDBCardTitle>{turtle.turtleClass} class</MDBCardTitle>
+          <MDBCardText>
+            Lore: {turtle.testLore}
+          </MDBCardText>
+        </MDBCardBody>
+        <MDBCardFooter>
+          SPD {turtle.testStat} / STR {turtle.testStat} / INT {turtle.testStat}
+        </MDBCardFooter>
+      </MDBCard>
+    </MDBCol>
+  );
+}
 
 class Bestiary extends React.Component {
   constructor(props) {
     super(props);
+    
+    this.state = {
+      turtleClasses: null
+    };
+  }
+  
+  async componentDidMount() {
+    // testing
+    await getTurtleClasses().then(turtleClasses => this.setState({ turtleClasses: turtleClasses }));
   }
 
   render() {
@@ -170,7 +201,8 @@ class Bestiary extends React.Component {
         <div>
           <MDBContainer className='container-fluid'>
             <MDBRow>
-              {many_turtles.map(make_card)}
+              {/* many_turtles.map(make_card) */}
+              {this.state.turtleClasses?.map(make_card)}
             </MDBRow>
           </MDBContainer>
         </div>
