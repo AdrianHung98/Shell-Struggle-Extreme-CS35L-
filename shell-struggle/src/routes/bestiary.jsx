@@ -35,17 +35,15 @@ import 'mdb-react-ui-kit/dist/css/mdb.min.css'
 // TODO: figure this out
 const temp_turtles = [
   {
-    name: 'a', 
-    desc: 'first temp turtle', 
+    turtle_class: 'Scientist', 
     spd: 10, 
     str: 10, 
     int: 10, 
-    lore: 'LOREm ipsum', 
+    lore: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 
     pic_url: 'https://images.squarespace-cdn.com/content/v1/5369465be4b0507a1fd05af0/1528837069483-LD1R6EJDDHBY8LBPVHIU/randall-ruiz-272502.jpg'
   }, 
   {
-    name: 'b', 
-    desc: 'second temp turtle', 
+    turtle_class: 'b', 
     spd: 20, 
     str: 20, 
     int: 20, 
@@ -118,9 +116,9 @@ function make_card(turtle) {
       <MDBCard style={{ width: '18rem' }} className='h-100'>
         <MDBCardImage position='top' src={turtle.pic_url} />
         <MDBCardBody>
-          <MDBCardTitle>{turtle.name}</MDBCardTitle>
+          <MDBCardTitle>{turtle.turtle_class} class</MDBCardTitle>
           <MDBCardText>
-            {turtle.desc}
+            Lore: {turtle.lore}
           </MDBCardText>
         </MDBCardBody>
         <MDBCardFooter>
