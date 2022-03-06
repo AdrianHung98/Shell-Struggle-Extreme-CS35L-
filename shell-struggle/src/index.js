@@ -12,7 +12,7 @@ ReactDOM.render(
     <Routes>
       <Route path="/" element={<SignInScreen/>}/>
       <Route path="select-screen" element={<App/>}/>
-      <Route path="gameCycle" element={<GameCycle/>}/>
+      <Route path="gameCycle" element={<GameCycle playerColor="Red" opponentColor="Blue"/>}/>
     </Routes>
   </BrowserRouter>,
   document.getElementById('root')
