@@ -29,6 +29,7 @@ import 'mdb-react-ui-kit/dist/css/mdb.min.css'
  * see: 
  * https://mdbootstrap.com/docs/b5/react/components/cards/
  * https://mdbootstrap.com/docs/b5/react/layout/grid/
+ * https://mdbootstrap.com/docs/b5/react/navigation/headers/
  */
 
 // TODO: figure this out
