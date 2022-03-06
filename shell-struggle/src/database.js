@@ -64,5 +64,32 @@ async function incWallet (user, amount) {
     return newAmount;
 }
 
-export { getTurtles, unlockTurtle, getWallet, incWallet }
+async function getNames(user) {
+    const userRef = await getUserRef(user);
+    const userProfile = await getDoc(userRef);
+    if (userProfile.exists()) {
+        const userData = userProfile.data();
+        return userData.names;
+    } else {
+        console.log("ERROR in getNames(): user", user, "does not exist"); return false;
+    }
+}
+
+async function setName(user, index, name) {
+    const userRef = await getUserRef(user);
+    let namesArray = await getNames(user);
+    if (namesArray === false) {return false}
+    namesArray[index] = name;
+    const newNames = {
+        turtles: namesArray
+    };
+    try {
+        await updateDoc(userRef, newNames);
+        return newNames;
+    } catch {
+        console.log("ERROR in unlockTurtle(): user", user, "did not exist"); return false;
+    }    
+}
+
+export { getTurtles, unlockTurtle, getWallet, incWallet, getNames }
 
