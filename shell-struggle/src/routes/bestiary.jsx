@@ -18,7 +18,7 @@ import {
   MDBIcon
 } from 'mdb-react-ui-kit';
 import 'mdb-react-ui-kit/dist/css/mdb.min.css'
-import { getTurtleClasses } from '../database';
+import { addTurtleClass, getTurtleClasses, resetTurtleClasses } from '../database';
 
 /**
  * see: 
@@ -45,46 +45,35 @@ import { getTurtleClasses } from '../database';
  * https://mdbootstrap.com/docs/b5/react/layout/grid/
  */
 
-// TODO: figure this out
-const temp_turtles = [
+const img1 = 'https://images.squarespace-cdn.com/content/v1/5369465be4b0507a1fd05af0/1528837069483-LD1R6EJDDHBY8LBPVHIU/randall-ruiz-272502.jpg';
+const img2 = 'https://news.stanford.edu/wp-content/uploads/2021/04/Sea-Turtle.jpg';
+
+const temp_turtleClasses = [
   {
-    turtle_class: 'Scientist', 
-    spd: 10, 
-    str: 10, 
-    int: 10, 
+    className: 'Scientist', 
+    health: 10, 
+    strength: 10, 
+    intelligence: 10, 
     lore: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 
-    pic_url: 'https://images.squarespace-cdn.com/content/v1/5369465be4b0507a1fd05af0/1528837069483-LD1R6EJDDHBY8LBPVHIU/randall-ruiz-272502.jpg'
+    image: img1
   }, 
   {
-    turtle_class: 'b', 
-    spd: 20, 
-    str: 20, 
-    int: 20, 
+    className: 'b', 
+    health: 20, 
+    strength: 20, 
+    intelligence: 20, 
     lore: 'b stands for better', 
-    pic_url: 'https://news.stanford.edu/wp-content/uploads/2021/04/Sea-Turtle.jpg'
+    image: img2
+  }, 
+  {
+    className: 'another', 
+    health: 30, 
+    strength: 30, 
+    intelligence: 30, 
+    lore: 'this is another', 
+    image: img1
   }
 ];
-
-const many_turtles = [
-  temp_turtles[0], 
-  temp_turtles[1], 
-  temp_turtles[0], 
-  temp_turtles[1], 
-  temp_turtles[1], 
-  temp_turtles[0], 
-  temp_turtles[1], 
-  temp_turtles[0], 
-  temp_turtles[0], 
-  temp_turtles[1], 
-  temp_turtles[0], 
-  temp_turtles[1], 
-  temp_turtles[1], 
-  temp_turtles[0], 
-  temp_turtles[1], 
-  temp_turtles[0], 
-  temp_turtles[0], 
-  temp_turtles[1] 
-]
 
 // TODO
 function temp_header() {
@@ -122,41 +111,19 @@ function temp_header() {
   );
 }
 
-/* 
-function make_card(turtle) {
-  // currently causes duplicate keys but shouldnt matter later
+function make_card(turtleClass) {
   return (
-    <MDBCol lg={true} style={{marginBottom: '1.5rem'}} className='col-3' key={turtle}>
+    <MDBCol lg={true} style={{marginBottom: '1.5rem'}} className='col-3' key={turtleClass.className}>
       <MDBCard style={{ width: '18rem' }} className='h-100'>
-        <MDBCardImage position='top' src={turtle.pic_url} />
+        <MDBCardImage position='top' src={turtleClass.image} />
         <MDBCardBody>
-          <MDBCardTitle>{turtle.turtle_class} class</MDBCardTitle>
+          <MDBCardTitle>{turtleClass.className} class</MDBCardTitle>
           <MDBCardText>
-            Lore: {turtle.lore}
+            Lore: {turtleClass.lore}
           </MDBCardText>
         </MDBCardBody>
         <MDBCardFooter>
-          SPD {turtle.spd} / STR {turtle.str} / INT {turtle.int}
-        </MDBCardFooter>
-      </MDBCard>
-    </MDBCol>
-  );
-}
-*/
-
-function make_card(turtle) {
-  return (
-    <MDBCol lg={true} style={{marginBottom: '1.5rem'}} className='col-3' key={turtle}>
-      <MDBCard style={{ width: '18rem' }} className='h-100'>
-        <MDBCardImage position='top' src={turtle.testImg} />
-        <MDBCardBody>
-          <MDBCardTitle>{turtle.turtleClass} class</MDBCardTitle>
-          <MDBCardText>
-            Lore: {turtle.testLore}
-          </MDBCardText>
-        </MDBCardBody>
-        <MDBCardFooter>
-          SPD {turtle.testStat} / STR {turtle.testStat} / INT {turtle.testStat}
+          HP {turtleClass.health} / STR {turtleClass.strength} / INT {turtleClass.intelligence}
         </MDBCardFooter>
       </MDBCard>
     </MDBCol>
@@ -173,7 +140,8 @@ class Bestiary extends React.Component {
   }
   
   async componentDidMount() {
-    // testing
+    await resetTurtleClasses();
+    temp_turtleClasses.forEach(async turtleClass => await addTurtleClass(turtleClass));
     await getTurtleClasses().then(turtleClasses => this.setState({ turtleClasses: turtleClasses }));
   }
 

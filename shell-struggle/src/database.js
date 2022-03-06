@@ -1,21 +1,27 @@
 import { firestore } from "./firebase";
-import { collection, doc, updateDoc, getDoc, getDocs, setDoc } from "firebase/firestore"
+import { collection, deleteDoc, doc, updateDoc, getDoc, getDocs, setDoc } from "firebase/firestore"
+
+async function addTurtleClass(turtleClass) {
+  await setDoc(doc(firestore, 'turtleClasses', turtleClass.className), turtleClass);
+}
 
 async function getTurtleClasses() {
-  const img = 'https://images.squarespace-cdn.com/content/v1/5369465be4b0507a1fd05af0/1528837069483-LD1R6EJDDHBY8LBPVHIU/randall-ruiz-272502.jpg';
-  const testTurtleClass = {
-    turtleClass: 'Scientist', 
-    testStat: 20, 
-    testLore: 'hi', 
-    testImg: img
-  };
-  await setDoc(doc(firestore, 'turtleClasses', 'testTurtle'), testTurtleClass);
   const turtleClassesCollectionRef = collection(firestore, 'turtleClasses');
   const turtleClassesSnapshot = await getDocs(turtleClassesCollectionRef);
   let turtleClasses = [];
   turtleClassesSnapshot.forEach(turtleClass => turtleClasses.push(turtleClass.data()));
-  console.log('hi');
   return turtleClasses;
+}
+
+async function getTurtleClass(className) {
+  const turtleClasses = await getTurtleClasses();
+  return turtleClasses.find(turtleClass => turtleClass.className === className);
+}
+
+async function resetTurtleClasses() {
+  const turtleClassesCollectionRef = collection(firestore, 'turtleClasses');
+  const turtleClassesSnapshot = await getDocs(turtleClassesCollectionRef);
+  turtleClassesSnapshot.forEach(async turtleClass => await deleteDoc(turtleClass.ref));
 }
 
 async function getUserRef (username) {
@@ -108,5 +114,5 @@ async function setName(user, index, name) {
     }    
 }
 
-export { getTurtleClasses, getTurtles, unlockTurtle, getWallet, incWallet, getNames, setName }
+export { addTurtleClass, getTurtleClasses, resetTurtleClasses, getTurtles, unlockTurtle, getWallet, incWallet, getNames, setName }
 
