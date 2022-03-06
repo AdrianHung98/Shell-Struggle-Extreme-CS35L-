@@ -1,8 +1,10 @@
 import React from 'react';
 // import './bestiary.css';
+import { Button, Card, Col, Container, Row } from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 // TODO: figure this out
-temp_turtles = [
+const temp_turtles = [
   {
     name: 'a', 
     stat_1: 10, 
@@ -21,6 +23,44 @@ temp_turtles = [
   }
 ];
 
+const many_turtles = [
+  temp_turtles[0], 
+  temp_turtles[1], 
+  temp_turtles[0], 
+  temp_turtles[1], 
+  temp_turtles[0], 
+  temp_turtles[1], 
+  temp_turtles[0], 
+  temp_turtles[1], 
+  temp_turtles[0], 
+  temp_turtles[1], 
+  temp_turtles[0], 
+  temp_turtles[1], 
+  temp_turtles[0], 
+  temp_turtles[1], 
+  temp_turtles[0], 
+  temp_turtles[1], 
+  temp_turtles[0], 
+  temp_turtles[1] 
+]
+
+function make_card(turtle) {
+  return (
+    <Col>
+      <Card style={{ width: '18rem' }}>
+        <Card.Img variant="top" src={turtle.pic_url} style={{width: '16rem'}}/>
+        <Card.Body>
+          <Card.Title>{turtle.name}</Card.Title>
+          <Card.Text>
+            Lore: {turtle.lore}
+          </Card.Text>
+          <Button variant="primary">do we need this button</Button>
+        </Card.Body>
+      </Card>
+    </Col>
+  );
+}
+
 class Bestiary extends React.Component {
   constructor(props) {
     super(props);
@@ -30,6 +70,12 @@ class Bestiary extends React.Component {
     return (
       <div>
         <h1>hi</h1>
+      
+        <Container>
+          <Row md={4}>
+            {many_turtles.map(make_card)}
+          </Row>
+        </Container>
       </div>
     );
   }
