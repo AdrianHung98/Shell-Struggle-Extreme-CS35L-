@@ -19,6 +19,7 @@ import {
 } from 'mdb-react-ui-kit';
 import 'mdb-react-ui-kit/dist/css/mdb.min.css'
 import { addTurtleClass, getTurtleClasses, resetTurtleClasses } from '../database';
+import Navbar from '../navbar';
 
 /**
  * see: 
@@ -75,42 +76,6 @@ const temp_turtleClasses = [
   }
 ];
 
-// TODO
-function temp_header() {
-  return (
-    <MDBNavbar expand='lg' light bgColor='white'>
-      <MDBContainer fluid>
-        <MDBNavbarToggler
-          aria-controls='navbarExample01'
-          aria-expanded='false'
-          aria-label='Toggle navigation'
-        >
-          <MDBIcon fas icon='bars' />
-          {/* icon does not show up */}
-        </MDBNavbarToggler>
-        <div className='collapse navbar-collapse' id='navbarExample01'>
-          <MDBNavbarNav right className='mb-2 mb-lg-0'>
-            <MDBNavbarItem active>
-              <MDBNavbarLink aria-current='page' href='#'>
-                Home (spoiler: doesnt work)
-              </MDBNavbarLink>
-            </MDBNavbarItem>
-            <MDBNavbarItem>
-              <MDBNavbarLink href='#'>Some Link</MDBNavbarLink>
-            </MDBNavbarItem>
-            <MDBNavbarItem>
-              <MDBNavbarLink href='#'>Some Other Link</MDBNavbarLink>
-            </MDBNavbarItem>
-            <MDBNavbarItem>
-              <MDBNavbarLink href='#'>Some Other Link 2</MDBNavbarLink>
-            </MDBNavbarItem>
-          </MDBNavbarNav>
-        </div>
-      </MDBContainer>
-    </MDBNavbar>
-  );
-}
-
 function make_card(turtleClass) {
   return (
     <MDBCol lg={true} style={{marginBottom: '1.5rem'}} className='col-3' key={turtleClass.className}>
@@ -149,7 +114,7 @@ class Bestiary extends React.Component {
     return (
       <div>
         <header>
-          {temp_header()}
+          <Navbar />
 
           <div
             className='p-5 text-center bg-image'
