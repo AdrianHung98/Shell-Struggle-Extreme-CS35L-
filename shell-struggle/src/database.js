@@ -91,5 +91,5 @@ async function setName(user, index, name) {
     }    
 }
 
-export { getTurtles, unlockTurtle, getWallet, incWallet, getNames }
+export { getTurtles, unlockTurtle, getWallet, incWallet, getNames, setName }
 
