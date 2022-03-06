@@ -32,6 +32,18 @@ import 'mdb-react-ui-kit/dist/css/mdb.min.css'
  * https://mdbootstrap.com/docs/b5/react/navigation/headers/
  */
 
+/**
+ * see: 
+ * https://react-bootstrap.github.io/components/cards/
+ * https://react-bootstrap.github.io/layout/grid/
+ *
+ * ^scratch that^
+ * 
+ * see: 
+ * https://mdbootstrap.com/docs/b5/react/components/cards/
+ * https://mdbootstrap.com/docs/b5/react/layout/grid/
+ */
+
 // TODO: figure this out
 const temp_turtles = [
   {
