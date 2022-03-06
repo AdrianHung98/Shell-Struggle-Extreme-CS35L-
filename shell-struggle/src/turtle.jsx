@@ -11,8 +11,8 @@ function Turtle(props) {
             <div>Here's a picture of me!</div>
             <img 
                 src={props.image} 
-                width="42"
-                height="42"
+                width="128"
+                height="128"
                 alt=""
                 />
         </div>
