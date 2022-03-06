@@ -1,7 +1,19 @@
 import React from 'react';
 // import './bestiary.css';
-import { Card, Col, Container, Row } from 'react-bootstrap';
+import { MDBCard, MDBCardBody, MDBCardFooter, MDBCardTitle, MDBCardText, MDBCardImage, MDBContainer, MDBRow, MDBCol } from 'mdb-react-ui-kit';
 import 'bootstrap/dist/css/bootstrap.min.css';
+
+/**
+ * see: 
+ * https://react-bootstrap.github.io/components/cards/
+ * https://react-bootstrap.github.io/layout/grid/
+ *
+ * ^scratch that^
+ * 
+ * see: 
+ * https://mdbootstrap.com/docs/b5/react/components/cards/
+ * https://mdbootstrap.com/docs/b5/react/layout/grid/
+ */
 
 // TODO: figure this out
 const temp_turtles = [
@@ -48,20 +60,20 @@ const many_turtles = [
 
 function make_card(turtle) {
   return (
-    <Col lg={true} style={{marginBottom: '1.5rem'}}>
-      <Card style={{ width: '18rem' }} className='h-100'>
-        <Card.Img variant='bottom' src={turtle.pic_url} style={{width: '18rem'}}/>
-        <Card.Body>
-          <Card.Title>{turtle.name}</Card.Title>
-          <Card.Text>
+    <MDBCol lg={true} style={{marginBottom: '1.5rem'}} className='col-3'>
+      <MDBCard style={{ width: '18rem' }} className='h-100'>
+        <MDBCardImage variant='bottom' src={turtle.pic_url} />
+        <MDBCardBody>
+          <MDBCardTitle>{turtle.name}</MDBCardTitle>
+          <MDBCardText>
             {turtle.desc}
-          </Card.Text>
-        </Card.Body>
-        <Card.Footer>
+          </MDBCardText>
+        </MDBCardBody>
+        <MDBCardFooter>
           SPD {turtle.spd} / STR {turtle.str} / INT {turtle.int}
-        </Card.Footer>
-      </Card>
-    </Col>
+        </MDBCardFooter>
+      </MDBCard>
+    </MDBCol>
   );
 }
 
@@ -75,11 +87,11 @@ class Bestiary extends React.Component {
       <div>
         <h1>hi</h1>
       
-        <Container class='row-cols-4'>
-          <Row>
+        <MDBContainer className='container-fluid'>
+          <MDBRow>
             {many_turtles.map(make_card)}
-          </Row>
-        </Container>
+          </MDBRow>
+        </MDBContainer>
       </div>
     );
   }
