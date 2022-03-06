@@ -21,7 +21,6 @@ function SignInScreen() {
       <h1>Shell Struggle Extreme</h1>
       <p>Please sign-in:</p>
       <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebase.auth()} />
-      <></>
     </div>
   );
 }
