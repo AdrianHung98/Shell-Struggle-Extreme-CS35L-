@@ -6,6 +6,17 @@ import './select-screen.css';
 import SignOutButton from '../sign-out-button';
 import { firestore } from '../firebase';
 import { getDoc, setDoc, updateDoc, doc } from "firebase/firestore";
+import { incWallet } from '../database';
+
+function newDateIsOneDayLater(oldDate, newDate) {
+  const old_split = oldDate.split("/");
+  const new_split = newDate.split("/");
+  const microsInDay = 86400000;
+  oldDate = new Date(old_split[2], old_split[1], old_split[0]);
+  newDate = new Date(new_split[2], new_split[1], new_split[0]);
+  const diff = Math.abs(oldDate - newDate);
+  return (diff < 2 * microsInDay) && (diff >= microsInDay)
+}
 
 class App extends React.Component {
   constructor(props) {
@@ -17,10 +28,14 @@ class App extends React.Component {
   async componentDidMount() {
     const profileRef = doc(firestore, 'users/' + this.uid);
     const d = new Date();
-    const date = String(d.getDate()) + "/" + String(d.getMonth()) + "/" + String(d.getFullYear());
+    const date = String(d.getDate()) + "/" + String(d.getMonth() + 1) + "/" + String(d.getFullYear());
 
     const profile = await getDoc(profileRef);
     if (profile.exists()) {
+      let updateData = {};
+      if (newDateIsOneDayLater(profile.data().loginDate, date)) {
+        incWallet(this.uid, 100);
+      }
       updateDoc(profileRef, {
         loginDate: date
       });

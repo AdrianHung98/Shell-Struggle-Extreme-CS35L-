@@ -31,7 +31,7 @@ function getUserRef (username) {
 } 
 
 async function getTurtles(user) {
-    const userRef = await getUserRef(user);
+    const userRef = getUserRef(user);
     const userProfile = await getDoc(userRef);
     if (userProfile.exists()) {
         const userData = userProfile.data();
