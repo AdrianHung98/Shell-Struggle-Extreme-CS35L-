@@ -3,11 +3,11 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter, Routes, Route} from 'react-router-dom';
 import { auth } from './firebase';
 import { onAuthStateChanged } from '@firebase/auth';
-import './index.css';
 import SignInScreen from './sign-in-screen';
 import App from './routes/select-screen';
 import GameCycle from './routes/game-cycle.jsx';
 import Bestiary from './routes/bestiary.jsx';
+import './index.css';
 
 onAuthStateChanged(auth, (user) => {
   if (user) {
@@ -15,6 +15,7 @@ onAuthStateChanged(auth, (user) => {
     // https://firebase.google.com/docs/reference/js/firebase.User
     const uid = user.uid;
     const email = user.email;
+
     ReactDOM.render(
       <BrowserRouter>
         <Routes>
