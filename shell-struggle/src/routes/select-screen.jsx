@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import './select-screen.css';
 import SignOutButton from '../sign-out-button';
 
-function App() {
+function App(props) {
   return (
     <div>
       <h1>Pages:</h1>
@@ -27,6 +27,8 @@ function App() {
       >
         <Link to="/bestiary">Bestiary</Link>
       </nav>
+      <div>Signed in as {props.email}</div>
+      <div>ID:{props.uid}</div>
       <SignOutButton/>
     </div>
   );
