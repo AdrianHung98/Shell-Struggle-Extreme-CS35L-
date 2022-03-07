@@ -12,7 +12,6 @@ function Turtle(props) {
                 width="128"
                 height="128"
                 alt=""
-                float="left"
                 />
             <ul>
                 <li>HP: {props.health}</li>

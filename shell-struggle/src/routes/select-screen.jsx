@@ -15,7 +15,8 @@ function App() {
           paddingbottom: "1rem",
         }}
       >
-        <Link to="/gameCycle">Game Cycle</Link>
+      <div><Link to="/gameCycleRed">Game Cycle as Red</Link></div>
+      <div><Link to="/gameCycleBlue">Game Cycle as Blue</Link></div>
       </nav>
 
       <nav

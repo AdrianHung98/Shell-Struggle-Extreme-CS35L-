@@ -10,6 +10,8 @@ const roomID = 'room'
 var messageRef = ref(db, roomID + '/message');
 var nextMoveRef = ref(db, roomID + '/nextMove');
 var redIsNextRef = ref(db, roomID + '/redIsNext');
+var redHealthRef = ref(db, roomID + '/redHealth');
+var blueHealthRef = ref(db, roomID + '/blueHealth');
 
 function setRedIsNext(bool) {
     set(redIsNextRef, {
@@ -20,6 +22,24 @@ function setRedIsNext(bool) {
 function setNextMove(move) {
     set(nextMoveRef, {
         nextMove: move
+    });
+}
+
+function setMessage(message) {
+    set(messageRef, {
+        message: message     
+    });
+}
+
+function setRedHealth(health) {
+    set(redHealthRef, {
+        redHealth: health
+    });
+}
+
+function setBlueHealth(health) {
+    set(blueHealthRef, {
+        blueHealth: health
     });
 }
 
@@ -54,12 +74,16 @@ class GameCycle extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            message: "none",
+            message: "",
             nextMove: "none",
             redIsNext: true,
-            playerHealth: 30,
-            opponentHealth: 30
+            redHealth: 30,
+            blueHealth: 30,
         };
+        setRedHealth(30);
+        setBlueHealth(30);
+        setNextMove("none");
+        setMessage("");
     };
 
     playerColor = this.props.playerColor;
@@ -68,20 +92,51 @@ class GameCycle extends React.Component {
     // Track message, nextMove, and redIsNext in the realtime database
     componentDidMount() {
         onValue(messageRef, (snapshot) => {
-            let message = snapshot.val();
+            let message = snapshot.val().message;
             this.setState({message: message});
         });
 
         // Process new move
         onValue(nextMoveRef, (snapshot) => {
-            let nextMove = snapshot.val();
-            console.log(nextMove);
+            let nextMove = (snapshot.val()).nextMove;
             this.setState({nextMove: nextMove});
+            if (nextMove === "none") {
+                return;
+            }
+            const nextPlayer = this.state.redIsNext ? "Red" : "Blue";
+            if (nextPlayer === "Red") {
+                let health = this.state.blueHealth - 10;
+                if (health <= 0) {
+                    health = 0;
+                    setMessage("Red Player Won!");
+                }
+                setBlueHealth(health);
+            } else {
+                let health = this.state.redHealth - 10;
+                if (health <= 0) {
+                    health = 0;
+                    setMessage("Blue Player Won!");
+                }
+                setRedHealth(health);
+            }
+            if (nextPlayer === this.playerColor) {
+                this.endTurn();
+            }
         });
 
         onValue(redIsNextRef, (snapshot) => {
-            let redIsNext = snapshot.val();
+            let redIsNext = snapshot.val().redIsNext;
             this.setState({redIsNext: redIsNext});
+        });
+
+        onValue(redHealthRef, (snapshot) => {
+            let redHealth = snapshot.val().redHealth;
+            this.setState({redHealth: redHealth});
+        });
+
+        onValue(blueHealthRef, (snapshot) => {
+            let blueHealth = snapshot.val().blueHealth;
+            this.setState({blueHealth: blueHealth});
         });
     }
 
@@ -90,6 +145,8 @@ class GameCycle extends React.Component {
         off(messageRef);
         off(nextMoveRef);
         off(redIsNextRef);
+        off(redHealthRef);
+        off(blueHealthRef);
     }
 
     endTurn() {
@@ -99,14 +156,35 @@ class GameCycle extends React.Component {
 
     render() {
         const nextPlayer = this.state.redIsNext ? "Red" : "Blue";
+        let turn = <div>It is the {nextPlayer} Player's Turn:</div>;
+        let redWon = false;
+        let blueWon = false;
+        if (this.state.redHealth <= 0) {
+            blueWon = true;
+            turn = <div></div>
+        }
+        if (this.state.opponentHealth <= 0) {
+            redWon = true;
+            turn = <div></div>
+        }
 
         let options = <div></div>;
-        if (nextPlayer === this.playerColor) {
+        if (nextPlayer === this.playerColor && !redWon && !blueWon) {
             options = <div>
                 <AttackButton attack="Bite" />
                 <AttackButton attack="Shell Bash" />
                 <AttackButton attack="Dive" />
             </div>
+        }
+
+        let playerHealth = 0;
+        let opponentHealth = 0;
+        if (this.playerColor === "Red") {
+            playerHealth = this.state.redHealth;
+            opponentHealth = this.state.blueHealth;
+        } else {
+            playerHealth = this.state.blueHealth;
+            opponentHealth = this.state.redHealth; 
         }
 
         return (
@@ -115,15 +193,15 @@ class GameCycle extends React.Component {
             <Player 
                 user="Sample Opponent" 
                 playerColor={this.opponentColor}
-                health={this.state.opponentHealth}>
+                health={opponentHealth}>
             </Player>
             <Player
                 user="Sample Player"
                 playerColor={this.playerColor}
-                health={this.state.playerHealth}>
+                health={playerHealth}>
             </Player>
             <div>{this.state.message}</div>
-            <div>It is currently the {nextPlayer} Player's Turn:</div>
+            {turn}
             {options}
         </div>
     );}
