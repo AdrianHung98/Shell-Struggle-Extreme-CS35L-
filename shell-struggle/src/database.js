@@ -24,9 +24,9 @@ async function resetTurtleClasses() {
   turtleClassesSnapshot.forEach(async turtleClass => await deleteDoc(turtleClass.ref));
 }
 
-async function getUserRef (username) {
+function getUserRef (username) {
     const userpath = 'users/' + username;
-    const userRef = await doc(firestore, userpath);
+    const userRef = doc(firestore, userpath);
     return userRef;
 } 
 
@@ -42,7 +42,7 @@ async function getTurtles(user) {
 }
 
 async function unlockTurtle(user, index) {
-    const userRef = await getUserRef(user);
+    const userRef = getUserRef(user);
     let turtleArray = await getTurtles(user);
     if (turtleArray === false) {return false}
     turtleArray[index] = true;
@@ -58,7 +58,7 @@ async function unlockTurtle(user, index) {
 }
 
 async function getWallet (user) {
-    const userRef = await getUserRef(user);
+    const userRef = getUserRef(user);
     const userProfile = await getDoc(userRef);
     if (userProfile.exists()) {
         const userData = userProfile.data();
@@ -75,7 +75,7 @@ async function incWallet (user, amount) {
     if (newAmount < 0) {
         console.log("ERROR in incWallet(): insufficient funcds"); return false;
     }
-    const userProfile = await getUserRef(user);
+    const userProfile = getUserRef(user);
     const newWallet = {
         wallet: newAmount
     }
@@ -88,7 +88,7 @@ async function incWallet (user, amount) {
 }
 
 async function getNames(user) {
-    const userRef = await getUserRef(user);
+    const userRef = getUserRef(user);
     const userProfile = await getDoc(userRef);
     if (userProfile.exists()) {
         const userData = userProfile.data();
@@ -99,7 +99,7 @@ async function getNames(user) {
 }
 
 async function setName(user, index, name) {
-    const userRef = await getUserRef(user);
+    const userRef = getUserRef(user);
     let namesArray = await getNames(user);
     if (namesArray === false) {return false}
     namesArray[index] = name;
