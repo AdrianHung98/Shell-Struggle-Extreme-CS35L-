@@ -7,6 +7,7 @@ import SignInScreen from './sign-in-screen';
 import App from './routes/select-screen';
 import GameCycle from './routes/game-cycle.jsx';
 import Bestiary from './routes/bestiary.jsx';
+import Lobby from './routes/lobby.js';
 import './index.css';
 
 onAuthStateChanged(auth, (user) => {
@@ -24,6 +25,7 @@ onAuthStateChanged(auth, (user) => {
           <Route path="bestiary" element={<Bestiary/>}/>
           <Route path="gameCycleRed" element={<GameCycle playerColor="Red" opponentColor="Blue"/>}/>
           <Route path="gameCycleBlue" element={<GameCycle playerColor="Blue" opponentColor="Red"/>}/>
+          <Route path="lobby"element={<Lobby uid={uid}/>}/>
         </Routes>
       </BrowserRouter>,
       document.getElementById('root')

@@ -23,7 +23,7 @@ class App extends React.Component {
     super(props);
     this.state = {
       icon: "",
-      picURL: " "
+      picUrl: ""
     }
 
     this.handleChange = this.handleChange.bind(this);
@@ -60,13 +60,13 @@ class App extends React.Component {
   }
 
   handleChange(event) {
-    this.setState({picURL: event.target.value});
+    this.setState({picUrl: event.target.value});
   }
 
   handleSubmit(event) {
     event.preventDefault();
-    uploadPicture(this.uid, this.state.picURL);
-    this.setState({icon: this.state.picURL});
+    uploadPicture(this.uid, this.state.picUrl);
+    this.setState({icon: this.state.picUrl});
   }
 
   render() {
@@ -80,24 +80,15 @@ class App extends React.Component {
             paddingbottom: "1rem",
           }}
         >
-        <div><Link to="/gameCycleRed">Game Cycle as Red</Link></div>
-        <div><Link to="/gameCycleBlue">Game Cycle as Blue</Link></div>
-        </nav>
-  
-        <nav
-          style={{
-            borderbottom: "solid 1px",
-            paddingbottom: "1rem",
-          }}
-        >
-          <Link to="/bestiary">Bestiary</Link>
+        <Link to="/lobby">Lobby</Link><br/>
+        <Link to="/bestiary">Bestiary</Link>
         </nav>
         <div>Signed in as {this.email}</div>
         <div>ID:{this.uid}</div>
         <form onSubmit={this.handleSubmit}>
           <label>
             Profile Picture URL:
-              <input type="text" value={this.state.value} onChange={this.handleChange} />
+              <input type="text" value={this.state.picUrl} onChange={this.handleChange} />
           </label>
           <input type="submit" value="Submit" />
         </form>
