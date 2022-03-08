@@ -21,6 +21,8 @@ function newDateIsOneDayLater(oldDate, newDate) {
 class App extends React.Component {
   constructor(props) {
     super(props);
+    // To avoid useless constructor warning
+    console.log("");
   }
   email = this.props.email;
   uid = this.props.uid;
@@ -32,7 +34,6 @@ class App extends React.Component {
 
     const profile = await getDoc(profileRef);
     if (profile.exists()) {
-      let updateData = {};
       if (newDateIsOneDayLater(profile.data().loginDate, date)) {
         incWallet(this.uid, 100);
       }
