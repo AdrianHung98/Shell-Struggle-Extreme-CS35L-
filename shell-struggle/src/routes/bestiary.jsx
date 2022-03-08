@@ -105,8 +105,10 @@ class Bestiary extends React.Component {
   }
   
   async componentDidMount() {
+    // TODO: delete these
     await resetTurtleClasses();
     temp_turtleClasses.forEach(async turtleClass => await addTurtleClass(turtleClass));
+
     await getTurtleClasses().then(turtleClasses => this.setState({ turtleClasses: turtleClasses }));
   }
 
