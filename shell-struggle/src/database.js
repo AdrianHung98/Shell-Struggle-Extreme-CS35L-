@@ -114,9 +114,17 @@ async function setName(user, index, name) {
     }    
 }
 
+async function uploadPicture(user, url) {
+    const userRef = getUserRef(user);
+    updateDoc(userRef, {
+        icon: url
+    });
+}
+
 export { addTurtleClass, getTurtleClass, getTurtleClasses, resetTurtleClasses,
         getTurtles, unlockTurtle, 
         getWallet, incWallet,
-        getNames, setName
+        getNames, setName,
+        uploadPicture
 };
 

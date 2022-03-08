@@ -6,7 +6,7 @@ import './select-screen.css';
 import SignOutButton from '../sign-out-button';
 import { firestore } from '../firebase';
 import { getDoc, setDoc, updateDoc, doc } from "firebase/firestore";
-import { incWallet } from '../database';
+import { incWallet, uploadPicture } from '../database';
 
 function newDateIsOneDayLater(oldDate, newDate) {
   const old_split = oldDate.split("/");
@@ -21,8 +21,13 @@ function newDateIsOneDayLater(oldDate, newDate) {
 class App extends React.Component {
   constructor(props) {
     super(props);
-    // To avoid useless constructor warning
-    console.log("");
+    this.state = {
+      icon: "",
+      picURL: " "
+    }
+
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
   email = this.props.email;
   uid = this.props.uid;
@@ -32,7 +37,7 @@ class App extends React.Component {
     const d = new Date();
     const date = String(d.getDate()) + "/" + String(d.getMonth() + 1) + "/" + String(d.getFullYear());
 
-    const profile = await getDoc(profileRef);
+    let profile = await getDoc(profileRef);
     if (profile.exists()) {
       if (newDateIsOneDayLater(profile.data().loginDate, date)) {
         incWallet(this.uid, 100);
@@ -47,14 +52,28 @@ class App extends React.Component {
         wallet: 100,
         turtles: [true, false, false, false, false, false, false, false],
         names: ["", "", "", "", "", "", "", ""],
+        icon: "https://img.brickowl.com/files/image_cache/larger/lego-universe-bob-minifigure-25.jpg"
       });
+      profile = await getDoc(profileRef);
     }
+    this.setState({icon: profile.data().icon});
+  }
+
+  handleChange(event) {
+    this.setState({picURL: event.target.value});
+  }
+
+  handleSubmit(event) {
+    event.preventDefault();
+    uploadPicture(this.uid, this.state.picURL);
+    this.setState({icon: this.state.picURL});
   }
 
   render() {
     return (
       <div>
-        <h1>Pages:</h1>
+        <img src={this.state.icon} alt="" height="128" width="128"/>
+        <h1>Profile:</h1>
         <nav
           style={{
             borderbottom: "solid 1px",
@@ -75,6 +94,13 @@ class App extends React.Component {
         </nav>
         <div>Signed in as {this.email}</div>
         <div>ID:{this.uid}</div>
+        <form onSubmit={this.handleSubmit}>
+          <label>
+            Profile Picture URL:
+              <input type="text" value={this.state.value} onChange={this.handleChange} />
+          </label>
+          <input type="submit" value="Submit" />
+        </form>
         <SignOutButton/>
       </div>
     );
