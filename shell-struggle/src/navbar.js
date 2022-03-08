@@ -16,6 +16,7 @@ function Navbar() {
         <div className="collapse navbar-collapse" id="navbar">
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <NavbarItem text="Home" to="/select-screen" />
+            <NavbarItem text="Profile" to="/profile" />
             <NavbarItem text="Bestiary" to="/bestiary" />
           </ul>
       

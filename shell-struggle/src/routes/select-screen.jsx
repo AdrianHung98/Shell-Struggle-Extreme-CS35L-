@@ -26,6 +26,16 @@ function App() {
       >
         <Link to="/bestiary">Bestiary</Link>
       </nav>
+
+      <nav
+        style={{
+          borderbottom: "solid 1px",
+          paddingbottom: "1rem",
+        }}
+      >
+        <Link to="/profile">Profile</Link>
+      </nav>
+
       <SignOutButton/>
     </div>
   );
