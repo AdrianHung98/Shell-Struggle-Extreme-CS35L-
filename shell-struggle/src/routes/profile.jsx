@@ -78,6 +78,8 @@ class Profile extends React.Component {
         <hr />
 
         <div>
+          <h1 style={{ textAlign: 'center' }}>My Turtles</h1>
+          <div style={{ height: '1.5rem' }} />
           <MDBContainer className='container-fluid'>
             <MDBRow>
               { this.state.turtles.map(turtle => make_card(turtle.turtleClass, turtle.name)) }
