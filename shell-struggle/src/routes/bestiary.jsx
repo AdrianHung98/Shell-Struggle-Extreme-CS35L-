@@ -134,7 +134,6 @@ class Bestiary extends React.Component {
         <div>
           <MDBContainer className='container-fluid'>
             <MDBRow>
-              {/* many_turtles.map(make_card) */}
               {this.state.turtleClasses?.map(make_card)}
             </MDBRow>
           </MDBContainer>
