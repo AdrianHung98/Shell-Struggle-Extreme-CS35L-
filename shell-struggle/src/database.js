@@ -121,10 +121,28 @@ async function uploadPicture(user, url) {
     });
 }
 
+async function sendRequest(fromUser, toUser) {
+    console.log("Called sendRequest??");
+    const toRef = getUserRef(toUser);
+    const toUserProfile = await getDoc(toRef);
+    if (toUserProfile.exists()) {
+        const toUserData = toUserProfile.data();
+        let requests = toUserData.requests;
+        requests.push(fromUser);
+        if (requests.length > 5) {
+            requests = requests.slice(1, 6);
+        }
+        updateDoc(toRef, {requests: requests});
+    } else {
+        console.log("ERROR in getNames(): user", toUser, "does not exist"); return false;
+    }
+}
+
 export { addTurtleClass, getTurtleClass, getTurtleClasses, resetTurtleClasses,
         getTurtles, unlockTurtle, 
         getWallet, incWallet,
         getNames, setName,
-        uploadPicture
+        uploadPicture,
+        sendRequest
 };
 

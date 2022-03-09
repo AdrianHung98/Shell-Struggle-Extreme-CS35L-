@@ -5,8 +5,10 @@ import { Link } from 'react-router-dom';
 import './select-screen.css';
 import SignOutButton from '../sign-out-button';
 import { firestore } from '../firebase';
-import { getDoc, setDoc, updateDoc, doc } from "firebase/firestore";
+import { getDoc, setDoc, updateDoc, doc, onSnapshot } from "firebase/firestore";
 import { incWallet, uploadPicture } from '../database';
+
+var stopRequestListener;
 
 function newDateIsOneDayLater(oldDate, newDate) {
   const old_split = oldDate.split("/");
@@ -18,12 +20,23 @@ function newDateIsOneDayLater(oldDate, newDate) {
   return (diff < 2 * microsInDay) && (diff >= microsInDay)
 }
 
+function Challenge(props) {
+  return(
+    <div>
+      {props.challenger} is challenging you to a duel!
+      <button>Accept</button>
+      <button>Reject</button>
+    </div>
+  );
+}
+
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       icon: "",
-      picUrl: ""
+      picUrl: "",
+      requests: []
     }
 
     this.handleChange = this.handleChange.bind(this);
@@ -43,7 +56,7 @@ class App extends React.Component {
         incWallet(this.uid, 100);
       }
       updateDoc(profileRef, {
-        loginDate: date
+        loginDate: date,
       });
     } else {
       setDoc(profileRef, {
@@ -52,11 +65,21 @@ class App extends React.Component {
         wallet: 100,
         turtles: [true, false, false, false, false, false, false, false],
         names: ["", "", "", "", "", "", "", ""],
-        icon: "https://img.brickowl.com/files/image_cache/larger/lego-universe-bob-minifigure-25.jpg"
+        icon: "https://img.brickowl.com/files/image_cache/larger/lego-universe-bob-minifigure-25.jpg",
+        requests: []
       });
       profile = await getDoc(profileRef);
     }
     this.setState({icon: profile.data().icon});
+
+    stopRequestListener = onSnapshot(profileRef, (doc) => {
+      const source = doc.metadata.hasPendingWrites ? "Local" : "Server";
+      this.setState({requests: doc.data().requests});
+    });
+  }
+
+  componentWillUnmount() {
+    stopRequestListener();
   }
 
   handleChange(event) {
@@ -70,6 +93,11 @@ class App extends React.Component {
   }
 
   render() {
+    console.log("requests is", this.state.requests);
+    const battleRequests = this.state.requests.map((request, index) =>
+        <div key={index}><Challenge challenger={request}></Challenge></div>
+    );
+
     return (
       <div>
         <img src={this.state.icon} alt="" height="128" width="128"/>
@@ -92,6 +120,7 @@ class App extends React.Component {
           </label>
           <input type="submit" value="Submit" />
         </form>
+        {battleRequests}
         <SignOutButton/>
       </div>
     );
