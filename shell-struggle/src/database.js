@@ -44,7 +44,6 @@ async function getUserProfile(uid) {
 async function getUIDByUsername(username) {
   const userMapRef = await doc(firestore, 'users/userMap');
   const userMap = (await getDoc(userMapRef)).data();
-  console.log(userMap);
   return userMap[username];
 }
 
