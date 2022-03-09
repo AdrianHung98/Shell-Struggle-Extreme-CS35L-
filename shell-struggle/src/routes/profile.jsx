@@ -83,25 +83,25 @@ class Profile extends React.Component {
 
     this.state = {
       userProfile: null, 
+      me: null, 
       turtles: [] 
     };
   }
 
   async choose(uid) {
     const opponent = (await getUserProfile(uid)).username;
-    const me = await getUserProfile(this.props.uid);
     let msg = `Which turtle do you want to duel ${opponent} with?\nChoose from: \n`;
-    if (!me.turtles) {
+    if (!this.state.me?.turtles) {
       alert('Turtles not loaded.');
       return null;
     }
-    for (const turtleClass in me.turtles) {
-      msg += `  ${me.turtles[turtleClass]}\n`;
+    for (const turtleClass in this.state.me.turtles) {
+      msg += `  ${this.state.me.turtles[turtleClass]}\n`;
     }
-    const selection = prompt(msg, me.turtles['Standard']);
-    for (const turtleClass in me.turtles) {
+    const selection = prompt(msg, this.state.me.turtles['Standard']);
+    for (const turtleClass in this.state.me.turtles) {
       console.log(selection);
-      if (selection === me.turtles[turtleClass]) {
+      if (selection === this.state.me.turtles[turtleClass]) {
         return (await getTurtleClass(turtleClass)).className;
       }
     }
@@ -146,7 +146,8 @@ class Profile extends React.Component {
       
     }
     const userProfile = profile?.data();
-    this.setState({ userProfile: userProfile });
+    const me = await getUserProfile(this.props.uid);
+    this.setState({ userProfile: userProfile, me: me });
     
     // preprocess the turtles into {turtleClass, name} format
     if (userProfile.turtles) {
