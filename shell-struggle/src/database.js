@@ -190,7 +190,7 @@ async function sendRequest(fromUser, toUser) {
         }
         updateDoc(toRef, {requests: requests});
     } else {
-        console.log("ERROR in getNames(): user", toUser, "does not exist"); return false;
+        console.log("ERROR in sendRequest(): user", toUser, "does not exist"); return false;
     }
 }
 

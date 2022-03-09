@@ -28,7 +28,6 @@ class App extends React.Component {
             paddingbottom: "1rem",
           }}
         >
-        <Link to="/lobby">Lobby</Link><br/>
         <Link to="/bestiary">Bestiary</Link><br/>
         <Link to={ `/profile/${this.props.uid}` }>Profile</Link><br/>
         <Link to="/shop">Shop</Link><br/>

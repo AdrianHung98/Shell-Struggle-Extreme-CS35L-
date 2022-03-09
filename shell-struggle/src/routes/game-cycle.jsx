@@ -35,7 +35,7 @@ function Player(props) {
         <div>
             <Turtle 
             image="https://blog.emojipedia.org/content/images/2020/07/android-11-turtle-emoji.jpg"
-            health={props.health} intelligence="10" strength="10">
+            health={props.health} intelligence={props.intelligence} strength={props.strength}>
             </Turtle>
             <div>Player: {props.user} ({props.playerColor})</div>
         </div>
@@ -66,7 +66,9 @@ class GameCycle extends React.Component {
     async componentDidMount() {
         // Get player Turtles
         const playerTurtles = await getTurtles(this.props.puid);
-        // this.setState(playerTurtles: )
+        this.setState({playerTurtles: playerTurtles});
+        const opponentTurtles = await getTurtles(this.props.opuid);
+        this.setState({opponentTurtles: opponentTurtles});
 
         onValue(nextMoveRef, (snapshot) => {
             this.processMove(snapshot);   
@@ -164,7 +166,10 @@ class GameCycle extends React.Component {
             playerHealth = this.state.blueHealth;
             opponentHealth = this.state.redHealth; 
         }
-
+        const pTurt = this.state.playerTurtles;
+        const oTurt = this.state.opponentTurtles;
+        if (pTurt === null || oTurt === null)
+            return(<div>Loading ... </div>);
         return (
         <div>
             <h1>Shell Struggle EXTREME</h1>
