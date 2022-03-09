@@ -155,14 +155,34 @@ class Profile extends React.Component {
                   <div className="d-flex pt-1">
                     {
                       this.props.uid == this.props.viewing_uid ? 
-                        <button type="button" className="btn btn-primary flex-grow-1" onClick={async () => {
-                          const profileRef = await getUserRef(this.props.uid);
-                          const profile = (await getDoc(profileRef)).data();
-                          const icon = prompt("Please enter the url for the new profile picture: ", profile.icon);
-                          await updateDoc(profileRef, { icon: icon });
-                          const newUserProfile = (await getDoc(profileRef)).data();
-                          this.setState({ userProfile: newUserProfile });
-                        }}>Change Profile Picture</button>
+                        <div>
+                          <button type="button" className="btn btn-primary flex-grow-1 mb-1" onClick={async () => {
+                            const profileRef = await getUserRef(this.props.uid);
+                            const profile = (await getDoc(profileRef)).data();
+                            const username = prompt("Please enter a new username: ", profile.username);
+                            const userMapRef = await doc(firestore, 'users/userMap');
+                            const userMap = (await getDoc(userMapRef)).data();
+                            if (userMap[username]) {
+                              if (userMap[username] !== this.props.uid) alert(`Username change failed. Username "${username}" is already in use.`);
+                              return;
+                            }
+                            delete userMap[profile.username];
+                            userMap[username] = this.props.uid;
+                            setDoc(userMapRef, userMap);
+                            await updateDoc(profileRef, { username: username });
+                            const newUserProfile = (await getDoc(profileRef)).data();
+                            this.setState({ userProfile: newUserProfile });
+                          }}>Change Username</button>
+
+                          <button type="button" className="btn btn-primary flex-grow-1" onClick={async () => {
+                            const profileRef = await getUserRef(this.props.uid);
+                            const profile = (await getDoc(profileRef)).data();
+                            const icon = prompt("Please enter the url for the new profile picture: ", profile.icon);
+                            await updateDoc(profileRef, { icon: icon });
+                            const newUserProfile = (await getDoc(profileRef)).data();
+                            this.setState({ userProfile: newUserProfile });
+                          }}>Change Profile Picture</button>
+                        </div>
                       : 
                         <button type="button" className="btn btn-primary flex-grow-1">Challenge</button>
                     }
