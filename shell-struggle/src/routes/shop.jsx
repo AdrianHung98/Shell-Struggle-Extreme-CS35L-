@@ -2,7 +2,7 @@
 
 import React from 'react';
 import './shop.css';
-import {getWallet, incWallet} from "../database";
+import {getWallet, incWallet, getTurtles} from "../database";
 
 class Shop extends React.Component {
     constructor(props) {
@@ -10,7 +10,9 @@ class Shop extends React.Component {
         this.state = {
             user: props.user,
             balance: 0,
-            turtles: []
+            turtles: [],
+            unlockedCollection: [],
+            lockedCollection: []
 
         };
 
@@ -19,16 +21,40 @@ class Shop extends React.Component {
     };
 
     async changeBalance(){
-        //var bal = await incWallet(this.state.user.uid, 10);
-        //this.setState({
-            //balance: bal
-        //})
+        var bal = await incWallet(this.state.user.uid, 10);
+        this.setState({
+            balance: bal
+        })
     }
 
 
     async componentDidMount(){
-       // var bal = await getWallet(this.state.user.uid);
-        //this.setState({balance: bal});
+        var bal = await getWallet(this.state.user.uid);
+        var turts = await getTurtles(this.state.user.uid);
+
+        this.setState({
+            balance: bal,
+            turtles: turts
+        });
+
+        let unlockedCollection = [];
+        
+        for(let i = 0; i < this.state.turtles.length; i++){
+
+            if(this.state.turtles[i] === true){
+                this.setState(
+                    state => 
+                    ({unlockedCollection: state.unlockedCollection.concat([state.turtles[i]])})
+                );
+            }
+            else{
+                this.setState(
+                    state => 
+                    ({locked: state.lockedCollection.concat([state.turtles[i]])})
+                );
+            }
+        }
+
     }
 
     componentWillUnmount(){
