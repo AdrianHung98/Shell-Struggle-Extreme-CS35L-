@@ -24,11 +24,44 @@ async function resetTurtleClasses() {
   turtleClassesSnapshot.forEach(async turtleClass => await deleteDoc(turtleClass.ref));
 }
 
-function getUserRef (username) {
-    const userpath = 'users/' + username;
-    const userRef = doc(firestore, userpath);
+async function getUserRef (uid) {
+    const userpath = 'users/' + uid;
+    const userRef = await doc(firestore, userpath);
     return userRef;
 } 
+
+async function getUserProfile(uid) {
+  const userRef = await getUserRef(uid);
+  const userProfile = await getDoc(userRef);
+  if (userProfile.exists()) {
+    return userProfile.data();
+  } else {
+    console.log("user with uid", uid, "does not exist");
+    return false;
+  }
+}
+
+async function getUIDByUsername(username) {
+  const userMapRef = await doc(firestore, 'users/userMap');
+  const userMap = (await getDoc(userMapRef)).data();
+  console.log(userMap);
+  return userMap[username];
+}
+
+
+/**
+ * im storing user turtles like this: 
+ *   {
+ *     turtle_class_1: custom_name_1, 
+ *     turtle_class_2: custom_name_2
+ *   }
+ * 
+ * if the user doesn't have a turtle of some class, it's just undefined
+ * this is indicated by a null value when you try to access
+ *  getTurtles(uid)['SomeTurtleClassTheUserDoesntHave']
+ * 
+ * you can see how i use this design choice in profile.jsx
+ */
 
 async function getTurtles(user) {
     const userRef = getUserRef(user);
@@ -41,20 +74,45 @@ async function getTurtles(user) {
     }
 }
 
-async function unlockTurtle(user, index) {
-    const userRef = getUserRef(user);
-    let turtleArray = await getTurtles(user);
-    if (turtleArray === false) {return false}
-    turtleArray[index] = true;
-    const newTurtles = {
-        turtles: turtleArray
-    };
-    try {
-        await updateDoc(userRef, newTurtles);
-        return newTurtles;
-    } catch {
-        console.log("ERROR in unlockTurtle(): user", user, "did not exist"); return false;
-    }
+// helper function for testing, clears all entries in getTurtles(uid)
+async function resetUserTurtles(user) {
+  const userRef = await getUserRef(user);
+  const delta = { turtles: {} };
+  try {
+      await updateDoc(userRef, delta);
+  } catch {
+      console.log("ERROR in resetUserTurtles(): user", user, "did not exist");
+  }
+}
+
+// renaming a turtle is simply changing the value of getTurtles(uid)['TurtleClass']
+async function renameTurtle(user, turtleClass, name) {
+  const userRef = await getUserRef(user);
+  let turtles = await getTurtles(user);
+  if (turtles === false) {
+    // create it if it doesnt exist
+    // (shouldnt happen)
+    turtles = {};
+  }
+  turtles[turtleClass] = name;
+  const delta = { turtles: turtles };
+  try {
+      await updateDoc(userRef, delta);
+      return turtles;
+  } catch {
+      console.log("ERROR in renameTurtle(): user", user, "did not exist"); return false;
+  }
+}
+
+// unlocking a turtle is the same as renaming
+// except it checks for whether the user already has the turtle class or not
+// returns false if the user already has the turtle class
+async function unlockTurtle(user, turtleClass, name) {
+  let turtles = await getTurtles(user);
+  if (turtles === false) turtles = {};
+  // user already has this turtle class
+  if (turtles[turtleClass]) return false;
+  return await renameTurtle(user, turtleClass, name);
 }
 
 async function getWallet (user) {
@@ -138,11 +196,12 @@ async function sendRequest(fromUser, toUser) {
     }
 }
 
-export { addTurtleClass, getTurtleClass, getTurtleClasses, resetTurtleClasses,
-        getTurtles, unlockTurtle, 
-        getWallet, incWallet,
-        getNames, setName,
-        uploadPicture,
-        sendRequest
+export { 
+  addTurtleClass, getTurtleClass, getTurtleClasses, resetTurtleClasses,
+  getUserProfile, getUIDByUsername, 
+  getTurtles, unlockTurtle, renameTurtle, resetUserTurtles, 
+  getWallet, incWallet,
+  getNames, setName,
+  uploadPicture,
+  sendRequest
 };
-

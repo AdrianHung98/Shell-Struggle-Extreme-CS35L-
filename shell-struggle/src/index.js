@@ -7,6 +7,7 @@ import SignInScreen from './sign-in-screen';
 import App from './routes/select-screen';
 import GameCycle from './routes/game-cycle.jsx';
 import Bestiary from './routes/bestiary.jsx';
+import ProfileWrapper from './routes/profile.jsx';
 import Lobby from './routes/lobby.js';
 import Shop from './routes/shop.jsx';
 import './index.css';
@@ -21,13 +22,14 @@ onAuthStateChanged(auth, (user) => {
     ReactDOM.render(
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<App uid={uid} email={email}/>}/>
-          <Route path="select-screen" element={<App uid={uid} email={email}/>}/>
-          <Route path="bestiary" element={<Bestiary/>}/>
+          <Route exact path="/" element={<App uid={uid} email={email}/>}/>
+          <Route exact path="/select-screen" element={<App uid={uid} email={email}/>}/>
+          <Route exact path="/bestiary" element={<Bestiary/>}/>
+          <Route exact path="/profile/:viewing_uid" element={<ProfileWrapper uid={uid}/>}/>
           <Route path="gameCycleRed" element={<GameCycle playerColor="Red" opponentColor="Blue"/>}/>
           <Route path="gameCycleBlue" element={<GameCycle playerColor="Blue" opponentColor="Red"/>}/>
-          <Route path="lobby"element={<Lobby uid={uid}/>}/>
-          <Route path="shop"element={<Shop user={user}/>}/>
+          <Route exact path="/lobby"element={<Lobby uid={uid}/>}/>
+          <Route exact path="/shop"element={<Shop user={user}/>}/>
         </Routes>
       </BrowserRouter>,
       document.getElementById('root')
@@ -40,5 +42,3 @@ onAuthStateChanged(auth, (user) => {
     );
   }
 });
-
-
