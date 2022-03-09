@@ -9,13 +9,7 @@ import {
   MDBCardImage, 
   MDBContainer, 
   MDBRow, 
-  MDBCol, 
-  MDBNavbar, 
-  MDBNavbarItem, 
-  MDBNavbarLink, 
-  MDBNavbarNav, 
-  MDBNavbarToggler, 
-  MDBIcon
+  MDBCol 
 } from 'mdb-react-ui-kit';
 import 'mdb-react-ui-kit/dist/css/mdb.min.css'
 import { addTurtleClass, getTurtleClasses, resetTurtleClasses } from '../database';
@@ -49,31 +43,71 @@ import Navbar from '../navbar';
 const img1 = 'https://images.squarespace-cdn.com/content/v1/5369465be4b0507a1fd05af0/1528837069483-LD1R6EJDDHBY8LBPVHIU/randall-ruiz-272502.jpg';
 const img2 = 'https://news.stanford.edu/wp-content/uploads/2021/04/Sea-Turtle.jpg';
 
-const temp_turtleClasses = [
+const turtleClasses = [
   {
-    className: 'Scientist', 
-    health: 10, 
-    strength: 10, 
-    intelligence: 10, 
-    lore: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 
+    className: 'Standard', 
+    health: 5, 
+    strength: 5, 
+    intelligence: 5, 
+    lore: 'im standard', 
     image: img1
   }, 
   {
-    className: 'b', 
-    health: 20, 
-    strength: 20, 
-    intelligence: 20, 
-    lore: 'b stands for better', 
+    className: 'Builder', 
+    health: 10, 
+    strength: 10, 
+    intelligence: 5, 
+    lore: 'im builder', 
     image: img2
   }, 
   {
-    className: 'another', 
-    health: 30, 
-    strength: 30, 
-    intelligence: 30, 
-    lore: 'this is another', 
+    className: 'Chef', 
+    health: 10, 
+    strength: 5, 
+    intelligence: 10, 
+    lore: 'im chef', 
     image: img1
-  }
+  }, 
+  {
+    className: 'Tank', 
+    health: 10, 
+    strength: 20, 
+    intelligence: 5, 
+    lore: 'im tank', 
+    image: img2
+  }, 
+  {
+    className: 'Mage', 
+    health: 5, 
+    strength: 10, 
+    intelligence: 20, 
+    lore: 'im mage', 
+    image: img1
+  }, 
+  {
+    className: 'Cupid', 
+    health: 20, 
+    strength: 5, 
+    intelligence: 5, 
+    lore: 'im cupid', 
+    image: img2
+  }, 
+  {
+    className: 'Robot', 
+    health: 10, 
+    strength: 5, 
+    intelligence: 10, 
+    lore: 'im robot', 
+    image: img1
+  }, 
+  {
+    className: 'Mewtwo', 
+    health: 5, 
+    strength: 5, 
+    intelligence: 20, 
+    lore: 'im mewtwo', 
+    image: img2
+  } 
 ];
 
 function make_card(turtleClass) {
@@ -105,9 +139,9 @@ class Bestiary extends React.Component {
   }
   
   async componentDidMount() {
-    // TODO: delete these
-    await resetTurtleClasses();
-    temp_turtleClasses.forEach(async turtleClass => await addTurtleClass(turtleClass));
+    // reset turtle classes
+    // await resetTurtleClasses();
+    // turtleClasses.forEach(async turtleClass => await addTurtleClass(turtleClass));
 
     await getTurtleClasses().then(turtleClasses => this.setState({ turtleClasses: turtleClasses }));
   }
@@ -116,7 +150,7 @@ class Bestiary extends React.Component {
     return (
       <div>
         <header>
-          <Navbar />
+          <Navbar uid={ this.props.uid }/>
 
           <div
             className='p-5 text-center bg-image'

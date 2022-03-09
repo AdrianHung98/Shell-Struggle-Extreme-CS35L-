@@ -9,14 +9,14 @@ function NavbarItem(props) {
   );
 }
 
-function Navbar() {
+function Navbar(props) {
     return (
       <nav className="navbar navbar-expand-lg navbar-light bg-white">
       <div className="container-fluid">
         <div className="collapse navbar-collapse" id="navbar">
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <NavbarItem text="Home" to="/select-screen" />
-            <NavbarItem text="Profile" to="/profile" />
+            <NavbarItem text="Profile" to={`/profile/${props.uid}`} />
             <NavbarItem text="Bestiary" to="/bestiary" />
           </ul>
       

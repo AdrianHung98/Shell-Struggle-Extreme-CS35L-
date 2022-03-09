@@ -44,12 +44,12 @@ class Profile extends React.Component {
   }
 
   async componentDidMount() {
-    await resetUserTurtles(this.props.uid);
+    await resetUserTurtles(this.props.viewing_uid);
     // simulate user unlocking the 'Scientist' turtle class and naming it 'this is a custom name'
-    await unlockTurtle(this.props.uid, 'Scientist', 'this is a custom name');
+    await unlockTurtle(this.props.viewing_uid, 'Scientist', 'this is a custom name');
     // simulate user unlocking the 'b' turtle class and naming it 'this is a custom name'
-    await unlockTurtle(this.props.uid, 'b', 'this is another custom name');
-    await getUserProfile(this.props.uid).then(userProfile => this.setState({ userProfile: userProfile }));
+    await unlockTurtle(this.props.viewing_uid, 'b', 'this is another custom name');
+    await getUserProfile(this.props.viewing_uid).then(userProfile => this.setState({ userProfile: userProfile }));
     // preprocess the turtles into {turtleClass, name} format
     if (this.state.userProfile?.turtles) {
       const turtles = [];
@@ -69,7 +69,7 @@ class Profile extends React.Component {
     return (
       <div>
         <header>
-          <Navbar />
+          <Navbar uid={ this.props.uid }/>
         </header>
 
         <div style={{ height: '1.5rem' }} />

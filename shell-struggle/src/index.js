@@ -20,10 +20,10 @@ onAuthStateChanged(auth, (user) => {
     ReactDOM.render(
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<App uid={uid} email={email}/>}/>
-          <Route path="select-screen" element={<App uid={uid} email={email}/>}/>
-          <Route path="bestiary" element={<Bestiary/>}/>
-          <Route path="profile" element={<Profile uid={uid}/>}/>
+          <Route exact path="/" element={<App uid={uid} email={email}/>}/>
+          <Route exact path="/select-screen" element={<App uid={uid} email={email}/>}/>
+          <Route exact path="/bestiary" element={<Bestiary uid={uid}/>}/>
+          <Route exact path="/profile/:viewing_uid" element={<Profile uid={uid}/>}/>
           <Route path="gameCycleRed" element={<GameCycle playerColor="Red" opponentColor="Blue"/>}/>
           <Route path="gameCycleBlue" element={<GameCycle playerColor="Blue" opponentColor="Red"/>}/>
         </Routes>

@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import './select-screen.css';
 import SignOutButton from '../sign-out-button';
 
-function App() {
+function App(props) {
   return (
     <div>
       <h1>Pages:</h1>
@@ -33,7 +33,7 @@ function App() {
           paddingbottom: "1rem",
         }}
       >
-        <Link to="/profile">Profile</Link>
+        <Link to={ `/profile/${props.uid}` }>Profile</Link>
       </nav>
 
       <SignOutButton/>
