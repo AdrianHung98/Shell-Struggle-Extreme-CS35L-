@@ -51,12 +51,12 @@ class Profile extends React.Component {
   }
 
   async componentDidMount() {
-    await resetUserTurtles(this.props.viewing_uid);
-    // simulate user unlocking the 'Scientist' turtle class and naming it 'this is a custom name'
-    await unlockTurtle(this.props.viewing_uid, 'Scientist', 'this is a custom name');
-    // simulate user unlocking the 'b' turtle class and naming it 'this is a custom name'
-    await unlockTurtle(this.props.viewing_uid, 'b', 'this is another custom name');
-    await getUserProfile(this.props.viewing_uid).then(userProfile => this.setState({ userProfile: userProfile }));
+    await resetUserTurtles(this.props.uid);
+    // simulate user unlocking the 'Standard' turtle class and naming it 'this is a custom name'
+    await unlockTurtle(this.props.uid, 'Standard', 'this is a custom name');
+    // simulate user unlocking the 'Chef' turtle class and naming it 'this is a custom name'
+    // await unlockTurtle(this.props.viewing_uid, 'Chef', 'this is another custom name');
+    await getUserProfile(this.props.uid).then(userProfile => this.setState({ userProfile: userProfile }));
     // preprocess the turtles into {turtleClass, name} format
     if (this.state.userProfile?.turtles) {
       const turtles = [];
@@ -72,6 +72,10 @@ class Profile extends React.Component {
     }
   }
 
+  /**
+   * see: 
+   * https://mdbootstrap.com/docs/standard/extended/profiles/
+   */
   render() {
     return (
       <div>
@@ -79,8 +83,27 @@ class Profile extends React.Component {
           <Navbar uid={ this.props.uid }/>
         </header>
 
-        <div style={{ height: '1.5rem' }} />
-        <h1 style={{ textAlign: 'center' }}>display user data here...</h1>
+        <div className="container py-5 h-100">
+          <div className="row d-flex justify-content-center align-items-center h-100">
+            <div className="col col-md-9 col-lg-7 col-xl-5">
+              <div className="d-flex text-black">
+                <div className="flex-shrink-0">
+                  <img src={ this.state.userProfile?.icon } alt="Generic placeholder image" className="img-fluid" style={{ width: '12rem', borderRadius: '10px' }} />
+                </div>
+                <div className="flex-grow-1 ms-3">
+                  <h5 className="mb-1">{ this.state.userProfile?.username }</h5>
+                  <p className="mb-2 pb-1" style={{ color: '#2b2a2a' }}>{ this.state.userProfile?.turtles ? Object.keys(this.state.userProfile.turtles).length : '???' } Turtle{ this.state.userProfile?.turtles ? Object.keys(this.state.userProfile.turtles).length == 1 ? '' : 's' : '' } Collected</p>
+                  <div className="d-flex pt-1">
+                    {
+                      this.props.uid == this.props.viewing_uid ? null : 
+                        <button type="button" className="btn btn-primary flex-grow-1">Challenge</button>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <hr />
 
