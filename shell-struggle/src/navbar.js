@@ -1,4 +1,5 @@
 import React from "react";
+import 'mdb-react-ui-kit/dist/css/mdb.min.css';
 import SignOutButton from './sign-out-button';
 
 function NavbarItem(props) {
@@ -20,6 +21,14 @@ function Navbar(props) {
             <NavbarItem text="Bestiary" to="/bestiary" />
           </ul>
       
+          <div className="input-group m-1 w-25">
+            <input id="searchBar" type="search" className="form-control rounded col-2" placeholder="Search for User" aria-label="Search for User" aria-describedby="search-addon" />
+            <button type="button" className="btn btn-outline-primary" onClick={ 
+              () => {
+                const query = document.getElementById('searchBar').value;
+              }
+            }>search</button>
+          </div>
           <SignOutButton />
         </div>
       </div>
