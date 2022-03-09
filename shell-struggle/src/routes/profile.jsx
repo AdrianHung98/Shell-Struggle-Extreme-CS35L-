@@ -147,14 +147,23 @@ class Profile extends React.Component {
             <div className="col col-md-9 col-lg-7 col-xl-5">
               <div className="d-flex text-black">
                 <div className="flex-shrink-0">
-                  <img src={ this.state.userProfile?.icon } alt="Generic placeholder image" className="img-fluid" style={{ width: '12rem', borderRadius: '10px' }} />
+                  <img src={ this.state.userProfile?.icon } alt="User Profile Picture" className="img-fluid" style={{ width: '12rem', borderRadius: '10px' }} />
                 </div>
                 <div className="flex-grow-1 ms-3">
                   <h5 className="mb-1">{ this.state.userProfile?.username }</h5>
                   <p className="mb-2 pb-1" style={{ color: '#2b2a2a' }}>{ this.state.userProfile?.turtles ? Object.keys(this.state.userProfile.turtles).length : '???' } Turtle{ this.state.userProfile?.turtles ? Object.keys(this.state.userProfile.turtles).length === 1 ? '' : 's' : '' } Collected</p>
                   <div className="d-flex pt-1">
                     {
-                      this.props.uid == this.props.viewing_uid ? null : 
+                      this.props.uid == this.props.viewing_uid ? 
+                        <button type="button" className="btn btn-primary flex-grow-1" onClick={async () => {
+                          const profileRef = await getUserRef(this.props.uid);
+                          const profile = (await getDoc(profileRef)).data();
+                          const icon = prompt("Please enter the url for the new profile picture: ", profile.icon);
+                          await updateDoc(profileRef, { icon: icon });
+                          const newUserProfile = (await getDoc(profileRef)).data();
+                          this.setState({ userProfile: newUserProfile });
+                        }}>Change Profile Picture</button>
+                      : 
                         <button type="button" className="btn btn-primary flex-grow-1">Challenge</button>
                     }
                   </div>
