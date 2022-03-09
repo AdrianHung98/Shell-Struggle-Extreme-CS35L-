@@ -8,12 +8,14 @@ import {
   MDBCardImage, 
   MDBContainer, 
   MDBRow, 
-  MDBCol 
+  MDBCol, 
+  MDBListGroup, 
+  MDBListGroupItem 
 } from 'mdb-react-ui-kit';
 import 'mdb-react-ui-kit/dist/css/mdb.min.css';
 import 'font-awesome/css/font-awesome.min.css'
 import { useParams } from 'react-router-dom';
-import { getUserRef, getTurtleClass, getUserProfile, renameTurtle, resetUserTurtles, unlockTurtle, incWallet } from '../database';
+import { getUserRef, getTurtleClass, getUserProfile, renameTurtle, resetUserTurtles, unlockTurtle, incWallet, sendRequest } from '../database';
 import { firestore } from "../firebase";
 import { doc, updateDoc, setDoc, getDoc } from 'firebase/firestore';
 import Navbar from '../navbar';
@@ -136,13 +138,48 @@ class Profile extends React.Component {
       // render them
       this.setState({ turtles: turtles });
     }
-}
+  }
 
   /**
    * see: 
    * https://mdbootstrap.com/docs/standard/extended/profiles/
    */
   render() {
+    const requests = [];
+    const profile = this.state.userProfile;
+    if (profile && this.props.uid === this.props.viewing_uid) {
+      for (const fromUser of profile.requests) {
+        const request = <MDBListGroupItem>
+          {`${fromUser} challenges you to a duel!`}
+          <button type="button" className="btn-sm me-2" style={{ float: 'right' }} onClick={ async () => {
+            // decline challenge
+            profile.requests = profile.requests.filter(request => request !== fromUser);
+            const profileRef = await getUserRef(this.props.uid);
+            await updateDoc(profileRef, { requests: profile.requests });
+            this.setState({ userProfile: profile });
+            alert('Challenge declined.');
+          } }>Decline</button>
+          <button type="button" className="btn-sm btn-primary me-2" style={{ float: 'right' }} onClick={ async () => { 
+            // accept challenge
+            profile.requests = profile.requests.filter(request => request !== fromUser);
+            const profileRef = await getUserRef(this.props.uid);
+            await updateDoc(profileRef, { requests: profile.requests });
+            this.setState({ userProfile: profile });
+            alert('Challenge accepted.');
+          } }>Accept</button>
+        </MDBListGroupItem>;
+        requests.push(request);
+      }
+    }
+    const renderRequests = this.props.uid === this.props.viewing_uid ? 
+      <div>
+        <hr />
+
+        <MDBListGroup className="list-group-flush" style={{ minWidth: '22rem' }}>
+          { requests }
+        </MDBListGroup>
+      </div>
+      : null;
     return (
       <div>
         <header>
@@ -195,7 +232,7 @@ class Profile extends React.Component {
                           }}>Change Profile Picture</button>
                         </div>
                       : 
-                        <button type="button" className="btn btn-primary flex-grow-1">Challenge</button>
+                        <button type="button" className="btn btn-primary flex-grow-1" onClick={ () => sendRequest(this.props.uid, this.props.viewing_uid) }>Challenge</button>
                     }
                   </div>
                 </div>
@@ -228,6 +265,8 @@ class Profile extends React.Component {
             </MDBRow>
           </MDBContainer>
         </div>
+        
+        {renderRequests}
       </div>
     );
   }
