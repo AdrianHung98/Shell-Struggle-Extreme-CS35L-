@@ -178,12 +178,15 @@ async function uploadPicture(user, url) {
     });
 }
 
-async function sendRequest(fromUser, toUser) {
-    const toRef = getUserRef(toUser);
+async function sendRequest(fromUID, toUID) {
+    const toRef = await getUserRef(toUID);
     const toUserProfile = await getDoc(toRef);
+    const fromUser = (await getUserProfile(fromUID))?.username;
     if (toUserProfile.exists()) {
         const toUserData = toUserProfile.data();
         let requests = toUserData.requests;
+        // remove all previous requests from the same user
+        requests = requests.filter(user => user !== fromUser);
         requests.push(fromUser);
         if (requests.length > 5) {
             requests = requests.slice(1, 6);

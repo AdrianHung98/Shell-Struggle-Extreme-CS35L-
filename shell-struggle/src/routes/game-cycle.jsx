@@ -3,6 +3,7 @@
 import React from 'react';
 import { db } from '../firebase';
 import { off, ref, onValue, set } from "firebase/database"; 
+import { getUserProfile } from '../database';
 import Turtle from '../turtle';
 import { getTurtles } from '../database';
 
@@ -51,7 +52,8 @@ class GameCycle extends React.Component {
             redHealth: 30,
             blueHealth: 30,
             playerTurtles: null,
-            opponentTurtles: null
+            opponentTurtles: null,
+            room_id: null
         };
         setRedHealth(30);
         setBlueHealth(30);
@@ -69,6 +71,10 @@ class GameCycle extends React.Component {
         this.setState({playerTurtles: playerTurtles});
         const opponentTurtles = await getTurtles(this.props.opuid);
         this.setState({opponentTurtles: opponentTurtles});
+
+        // Get shared room ID
+        const room_id = (await getUserProfile(this.props.uid)).in_room;
+        this.setState({ room_id: room_id });
 
         onValue(nextMoveRef, (snapshot) => {
             this.processMove(snapshot);   
@@ -173,6 +179,7 @@ class GameCycle extends React.Component {
         return (
         <div>
             <h1>Shell Struggle EXTREME</h1>
+            <h2>Room: { this.state.room_id }</h2>
             <Player 
                 user="Sample Opponent" 
                 playerColor={this.opponentColor}
