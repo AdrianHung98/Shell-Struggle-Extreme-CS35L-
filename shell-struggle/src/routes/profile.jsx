@@ -11,17 +11,28 @@ import {
   MDBCol 
 } from 'mdb-react-ui-kit';
 import 'mdb-react-ui-kit/dist/css/mdb.min.css';
+import 'font-awesome/css/font-awesome.min.css'
 import { useParams } from 'react-router-dom';
-import { getTurtleClass, getUserProfile, resetUserTurtles, unlockTurtle } from '../database';
+import { getTurtleClass, getUserProfile, renameTurtle, resetUserTurtles, unlockTurtle } from '../database';
 import Navbar from '../navbar';
 
-function make_card(turtleClass, name) {
+function make_card(turtleClass, name, editable, renameCallback) {
   return (
     <MDBCol lg={true} style={{marginBottom: '1.5rem'}} className='col-3' key={turtleClass.className}>
       <MDBCard style={{ width: '18rem' }} className='h-100'>
         <MDBCardImage position='top' src={turtleClass.image} />
         <MDBCardBody>
-          <MDBCardTitle>{name}</MDBCardTitle>
+          <MDBCardTitle>{name + '  '} 
+          {
+            editable ?
+            <i className="fa fa-edit" onClick={ async () => {
+              const newName = prompt('Please give this turtle a new name: ', name);
+              await renameCallback(turtleClass, newName);
+            } }/>
+            :
+            null
+          }
+          </MDBCardTitle>
           <MDBCardText>
             Class: {turtleClass.className}
           </MDBCardText>
@@ -114,7 +125,15 @@ class Profile extends React.Component {
           <div style={{ height: '1.5rem' }} />
           <MDBContainer className='container-fluid'>
             <MDBRow>
-              { this.state.turtles.map(turtle => make_card(turtle.turtleClass, turtle.name)) }
+              { this.state.turtles.map(turtle => make_card(turtle.turtleClass, turtle.name, this.props.uid === this.props.viewing_uid, async (turtleClass, newName) => {
+                const turtles = this.state.turtles;
+                const turtle = turtles.filter(turtle => turtle.turtleClass.className === turtleClass.className)?.[0];
+                if (!turtle) return;
+                const newTurtles = turtles.filter(turtle => turtle.turtleClass.className !== turtleClass.className);
+                turtle.name = newName;
+                newTurtles.push(turtle);
+                this.setState({ turtle: newTurtles });
+              })) }
             </MDBRow>
           </MDBContainer>
         </div>
