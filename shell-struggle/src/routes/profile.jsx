@@ -69,6 +69,10 @@ function ProfileWrapper(props) {
   );
 }
 
+function turtleCompare(turtle1, turtle2) {
+  return turtle1.turtleClass.id - turtle2.turtleClass.id;
+}
+
 class Profile extends React.Component {
   constructor(props) {
     super(props);
@@ -127,6 +131,7 @@ class Profile extends React.Component {
         };
         turtles.push(turtle);
       }
+      turtles.sort(turtleCompare);
       // render them
       this.setState({ turtles: turtles });
     }
@@ -210,6 +215,7 @@ class Profile extends React.Component {
                 const newTurtles = turtles.filter(turtle => turtle.turtleClass.className !== turtleClass.className);
                 turtle.name = newName;
                 newTurtles.push(turtle);
+                newTurtles.sort(turtleCompare);
                 const userTurtles = this.state.userProfile.turtles;
                 userTurtles[turtle.turtleClass.className] = newName;
                 const profileRef = await getUserRef(this.props.uid);
