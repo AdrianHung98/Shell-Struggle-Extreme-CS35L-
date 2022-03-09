@@ -12,7 +12,7 @@ import {
 } from 'mdb-react-ui-kit';
 import 'mdb-react-ui-kit/dist/css/mdb.min.css';
 import { useParams } from 'react-router-dom';
-import { getTurtleClass, getUserProfile, resetUserTurtles, unlockTurtle } from '../database.js';
+import { getTurtleClass, getUserProfile, resetUserTurtles, unlockTurtle } from '../database';
 import Navbar from '../navbar';
 
 function make_card(turtleClass, name) {
@@ -51,13 +51,13 @@ class Profile extends React.Component {
   }
 
   async componentDidMount() {
-    // await resetUserTurtles(this.props.uid);
+    // await resetUserTurtles(this.props.viewing_uid);
     // simulate user unlocking the 'Standard' turtle class and naming it 'this is a custom name'
-    // await unlockTurtle(this.props.uid, 'Standard', 'this is a custom name');
+    // await unlockTurtle(this.props.viewing_uid, 'Standard', 'this is a custom name');
     // simulate user unlocking the 'Chef' turtle class and naming it 'this is a custom name'
     // await unlockTurtle(this.props.viewing_uid, 'Chef', 'this is another custom name');
     
-    await getUserProfile(this.props.uid).then(userProfile => this.setState({ userProfile: userProfile }));
+    await getUserProfile(this.props.viewing_uid).then(userProfile => this.setState({ userProfile: userProfile }));
     
     // preprocess the turtles into {turtleClass, name} format
     if (this.state.userProfile?.turtles) {

@@ -8,7 +8,7 @@ function SignOutButton() {
     let navigate = useNavigate()
     return(
         <button 
-            class="btn btn-primary col-1"
+            className="btn btn-primary col-1"
             onClick={() => {
                 try { signOut(auth) }
                 catch {console.log("ERROR in SignOutButton()");};

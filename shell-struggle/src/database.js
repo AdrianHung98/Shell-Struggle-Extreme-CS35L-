@@ -41,6 +41,13 @@ async function getUserProfile(user) {
   }
 }
 
+async function getUIDByUsername(username) {
+  const userMapRef = await doc(firestore, 'users/userMap');
+  const userMap = (await getDoc(userMapRef)).data();
+  console.log(userMap);
+  return userMap[username];
+}
+
 
 /**
  * im storing user turtles like this: 
@@ -138,4 +145,4 @@ async function incWallet (user, amount) {
     return newAmount;
 }
 
-export { addTurtleClass, getTurtleClass, getTurtleClasses, resetTurtleClasses, getTurtles, getUserProfile, resetUserTurtles, unlockTurtle, renameTurtle, getWallet, incWallet }
+export { addTurtleClass, getTurtleClass, getTurtleClasses, resetTurtleClasses, getTurtles, getUserProfile, getUIDByUsername, resetUserTurtles, unlockTurtle, renameTurtle, getWallet, incWallet }
