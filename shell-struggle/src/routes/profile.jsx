@@ -87,6 +87,27 @@ class Profile extends React.Component {
     };
   }
 
+  async choose(uid) {
+    const opponent = (await getUserProfile(uid)).username;
+    const me = await getUserProfile(this.props.uid);
+    let msg = `Which turtle do you want to duel ${opponent} with?\nChoose from: \n`;
+    if (!me.turtles) {
+      alert('Turtles not loaded.');
+      return null;
+    }
+    for (const turtleClass in me.turtles) {
+      msg += `  ${me.turtles[turtleClass]}\n`;
+    }
+    const selection = prompt(msg, me.turtles['Standard']);
+    for (const turtleClass in me.turtles) {
+      console.log(selection);
+      if (selection === me.turtles[turtleClass]) {
+        return (await getTurtleClass(turtleClass)).className;
+      }
+    }
+    return null;
+  }
+
   async componentDidMount() {
     // await resetUserTurtles(this.props.viewing_uid);
     // simulate user unlocking the 'Standard' turtle class and naming it 'this is a custom name'
@@ -156,7 +177,7 @@ class Profile extends React.Component {
       }
     });
   }
-
+  
   /**
    * see: 
    * https://mdbootstrap.com/docs/standard/extended/profiles/
@@ -180,7 +201,12 @@ class Profile extends React.Component {
             // accept challenge
             profile.requests = profile.requests.filter(request => request !== fromUser);
             const profileRef = await getUserRef(this.props.uid);
-            await updateDoc(profileRef, { requests: profile.requests, in_room: fromUser });
+            const turtle = await this.choose(this.props.viewing_uid);
+            if (!turtle) {
+              alert('Invalid turtle selection.');
+              return;
+            }
+            await updateDoc(profileRef, { requests: profile.requests, in_room: fromUser, using: turtle });
             this.setState({ userProfile: profile });
             await sendRequest(await getUIDByUsername(fromUser), await getUIDByUsername(fromUser));
             window.location.href = '/gameCycleBlue';
@@ -251,6 +277,14 @@ class Profile extends React.Component {
                         </div>
                       : 
                         <button type="button" className="btn btn-primary flex-grow-1" onClick={ async () => {
+                          const turtle = await this.choose(this.props.viewing_uid);
+                          console.log(turtle);
+                          if (!turtle) {
+                            alert('Invalid turtle selection.');
+                            return;
+                          }
+                          const profileRef = await getUserRef(this.props.uid);
+                          await updateDoc(profileRef, { using: turtle });
                           await sendRequest(this.props.uid, this.props.viewing_uid)
                           alert('Challenge request sent!');
                         } }>Challenge</button>
