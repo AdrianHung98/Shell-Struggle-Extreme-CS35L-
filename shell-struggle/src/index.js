@@ -24,7 +24,7 @@ onAuthStateChanged(auth, (user) => {
         <Routes>
           <Route exact path="/" element={<App uid={uid} email={email}/>}/>
           <Route exact path="/select-screen" element={<App uid={uid} email={email}/>}/>
-          <Route exact path="/bestiary" element={<Bestiary/>}/>
+          <Route exact path="/bestiary" element={<Bestiary uid={uid}/>}/>
           <Route exact path="/profile/:viewing_uid" element={<ProfileWrapper uid={uid}/>}/>
           <Route path="gameCycleRed" element={<GameCycle playerColor="Red" opponentColor="Blue"/>}/>
           <Route path="gameCycleBlue" element={<GameCycle playerColor="Blue" opponentColor="Red"/>}/>
