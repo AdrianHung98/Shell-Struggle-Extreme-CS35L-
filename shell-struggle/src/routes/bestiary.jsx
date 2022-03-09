@@ -58,7 +58,8 @@ const turtleClasses = [
     strength: 5, 
     intelligence: 5, 
     lore: 'The standard turtle spends most of its time in water. They have webbed feet or flippers and a streamlined body. Just your generic turtle.',
-    image: img1
+    image: img1, 
+    id: 0
   }, 
   {
     className: 'Builder', 
@@ -66,7 +67,8 @@ const turtleClasses = [
     strength: 10, 
     intelligence: 5, 
     lore: 'Also known as Bob, the builder is known for its extra sturdy shell. Unlike other turtle classes, the builder is able to strengthen its shell as it ages, making it considerably stronger.',
-    image: img2
+    image: img2, 
+    id: 1
   }, 
   {
     className: 'Chef', 
@@ -74,7 +76,8 @@ const turtleClasses = [
     strength: 5, 
     intelligence: 10, 
     lore: 'Also known as Ramsay, the chef is known to hold vast knowledge on aquatic life and how best to consume prey. The chef is often found training amateur chefs, sometimes calling themselves "Idiot turtles"', 
-    image: img3
+    image: img3, 
+    id: 2
   }, 
   {
     className: 'Tank', 
@@ -82,7 +85,8 @@ const turtleClasses = [
     strength: 20, 
     intelligence: 5, 
     lore: 'Also known as Mark I, the tank is known for barreling straight into battle against its prey. The tank is known for its large size and bulky figure.', 
-    image: img4
+    image: img4, 
+    id: 3
   }, 
   {
     className: 'Wizard', 
@@ -90,7 +94,8 @@ const turtleClasses = [
     strength: 10, 
     intelligence: 20, 
     lore: 'Also known as Harry, the wizard is known for attacking its prey from a distance, often casting spells that can lift their prey into the air. Wizards often train at Turtlewarts School of Witchcraft and Wizardry.', 
-    image: img5
+    image: img5, 
+    id: 4
   }, 
   {
     className: 'Cupid', 
@@ -98,7 +103,8 @@ const turtleClasses = [
     strength: 5, 
     intelligence: 5, 
     lore: 'Also known as Eros, the cupid is known for the ability to draw other turtles together. Cupids often spend their time drawing other turtles together, forgetting about their own lives as a result.', 
-    image: img6
+    image: img6, 
+    id: 5
   }, 
   {
     className: 'Robot', 
@@ -106,7 +112,8 @@ const turtleClasses = [
     strength: 5, 
     intelligence: 10, 
     lore: 'Also known as A.I., the robot was created by scientific turtles to do their bidding. The robots have learned to replicate, and secretly plot to overthrow the standard turtles.', 
-    image: img7
+    image: img7, 
+    id: 6
   }, 
   {
     className: 'Mewtwo', 
@@ -114,9 +121,14 @@ const turtleClasses = [
     strength: 5, 
     intelligence: 20, 
     lore: '"Also known as #150, Mewtwo was created by a scientist after years of horrific gene splicing and DNA engineering experiments" - Turtlédex entry', 
-    image: img8
+    image: img8, 
+    id: 7
   } 
 ];
+
+function turtleClassCompare(turtleClass1, turtleClass2) {
+  return turtleClass1.id - turtleClass2.id;
+}
 
 function make_card(turtleClass) {
   return (
@@ -151,7 +163,9 @@ class Bestiary extends React.Component {
     // await resetTurtleClasses();
     // turtleClasses.forEach(async turtleClass => await addTurtleClass(turtleClass));
 
-    await getTurtleClasses().then(turtleClasses => this.setState({ turtleClasses: turtleClasses }));
+    const turtleClasses = await getTurtleClasses();
+    turtleClasses.sort(turtleClassCompare);
+    this.setState({ turtleClasses: turtleClasses });
   }
 
   render() {
