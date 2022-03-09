@@ -10,8 +10,9 @@ import {
   MDBRow, 
   MDBCol 
 } from 'mdb-react-ui-kit';
-import 'mdb-react-ui-kit/dist/css/mdb.min.css'
-import { getTurtleClass, getUserProfile, resetUserTurtles, unlockTurtle } from '../database.js'
+import 'mdb-react-ui-kit/dist/css/mdb.min.css';
+import { useParams } from 'react-router-dom';
+import { getTurtleClass, getUserProfile, resetUserTurtles, unlockTurtle } from '../database.js';
 import Navbar from '../navbar';
 
 function make_card(turtleClass, name) {
@@ -30,6 +31,12 @@ function make_card(turtleClass, name) {
         </MDBCardFooter>
       </MDBCard>
     </MDBCol>
+  );
+}
+
+function ProfileWrapper(props) {
+  return (
+    <Profile viewing_uid={useParams().viewing_uid} uid={props.uid} />
   );
 }
 
@@ -91,4 +98,4 @@ class Profile extends React.Component {
   }
 }
 
-export default Profile
+export default ProfileWrapper;

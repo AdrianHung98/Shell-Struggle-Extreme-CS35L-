@@ -7,7 +7,7 @@ import SignInScreen from './sign-in-screen';
 import App from './routes/select-screen';
 import GameCycle from './routes/game-cycle.jsx';
 import Bestiary from './routes/bestiary.jsx';
-import Profile from './routes/profile.jsx';
+import ProfileWrapper from './routes/profile.jsx';
 import './index.css';
 
 onAuthStateChanged(auth, (user) => {
@@ -23,7 +23,7 @@ onAuthStateChanged(auth, (user) => {
           <Route exact path="/" element={<App uid={uid} email={email}/>}/>
           <Route exact path="/select-screen" element={<App uid={uid} email={email}/>}/>
           <Route exact path="/bestiary" element={<Bestiary uid={uid}/>}/>
-          <Route exact path="/profile/:viewing_uid" element={<Profile uid={uid}/>}/>
+          <Route exact path="/profile/:viewing_uid" element={<ProfileWrapper uid={uid}/>}/>
           <Route path="gameCycleRed" element={<GameCycle playerColor="Red" opponentColor="Blue"/>}/>
           <Route path="gameCycleBlue" element={<GameCycle playerColor="Blue" opponentColor="Red"/>}/>
         </Routes>
