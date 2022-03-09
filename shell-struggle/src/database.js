@@ -192,7 +192,6 @@ async function sendRequest(fromUID, toUID) {
             requests = requests.slice(1, 6);
         }
         updateDoc(toRef, {requests: requests});
-        alert('Challenge request sent!');
     } else {
         console.log("ERROR in getNames(): uid", toUID, "does not exist"); return false;
     }

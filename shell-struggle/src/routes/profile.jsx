@@ -15,8 +15,9 @@ import {
 import 'mdb-react-ui-kit/dist/css/mdb.min.css';
 import 'font-awesome/css/font-awesome.min.css'
 import { useParams } from 'react-router-dom';
-import { getUserRef, getTurtleClass, getUserProfile, renameTurtle, resetUserTurtles, unlockTurtle, incWallet, sendRequest } from '../database';
-import { firestore } from "../firebase";
+import { getUIDByUsername, getUserRef, getTurtleClass, getUserProfile, renameTurtle, resetUserTurtles, unlockTurtle, incWallet, sendRequest } from '../database';
+import { db, firestore } from "../firebase";
+import { ref, set } from "firebase/database"
 import { doc, updateDoc, setDoc, getDoc, onSnapshot } from 'firebase/firestore';
 import Navbar from '../navbar';
 
@@ -96,6 +97,7 @@ class Profile extends React.Component {
     const d = new Date();
     const date = String(d.getDate()) + "/" + String(d.getMonth() + 1) + "/" + String(d.getFullYear());
     const profileRef = await getUserRef(this.props.viewing_uid);
+
     let profile = await getDoc(profileRef);
     if (this.props.uid === this.props.viewing_uid){
       if (profile.exists()) {
@@ -121,9 +123,6 @@ class Profile extends React.Component {
         profile = await getDoc(profileRef);
       }
       
-      const requestListener = onSnapshot(profileRef, doc => {
-        this.setState({ userProfile: doc.data() });
-      });
     }
     const userProfile = profile?.data();
     this.setState({ userProfile: userProfile });
@@ -142,6 +141,20 @@ class Profile extends React.Component {
       // render them
       this.setState({ turtles: turtles });
     }
+
+    const userProfileRef = await getUserRef(this.props.uid);
+    const requestListener = onSnapshot(userProfileRef, async doc => {
+      const newProfile = doc.data();
+      // challege was accepted
+      if (newProfile.requests.includes(newProfile.username)) {
+        newProfile.requests = newProfile.requests.filter(request => request !== newProfile.username);
+        await updateDoc(userProfileRef, { requests: newProfile.requests, in_room: newProfile.username });
+        window.location.href = '/gameCycleRed';
+      }
+      if (this.props.uid === this.props.viewing_uid) {
+        this.setState({ userProfile: doc.data() });
+      }
+    });
   }
 
   /**
@@ -153,7 +166,7 @@ class Profile extends React.Component {
     const profile = this.state.userProfile;
     if (profile && this.props.uid === this.props.viewing_uid) {
       for (const fromUser of profile.requests) {
-        const request = <MDBListGroupItem>
+        const request = <MDBListGroupItem key={fromUser}>
           {`${fromUser} challenges you to a duel!`}
           <button type="button" className="btn-sm me-2" style={{ float: 'right' }} onClick={ async () => {
             // decline challenge
@@ -167,9 +180,10 @@ class Profile extends React.Component {
             // accept challenge
             profile.requests = profile.requests.filter(request => request !== fromUser);
             const profileRef = await getUserRef(this.props.uid);
-            await updateDoc(profileRef, { requests: profile.requests });
+            await updateDoc(profileRef, { requests: profile.requests, in_room: fromUser });
             this.setState({ userProfile: profile });
-            alert('Challenge accepted.');
+            await sendRequest(await getUIDByUsername(fromUser), await getUIDByUsername(fromUser));
+            window.location.href = '/gameCycleBlue';
           } }>Accept</button>
         </MDBListGroupItem>;
         requests.push(request);
@@ -236,7 +250,10 @@ class Profile extends React.Component {
                           }}>Change Profile Picture</button>
                         </div>
                       : 
-                        <button type="button" className="btn btn-primary flex-grow-1" onClick={ () => sendRequest(this.props.uid, this.props.viewing_uid) }>Challenge</button>
+                        <button type="button" className="btn btn-primary flex-grow-1" onClick={ async () => {
+                          await sendRequest(this.props.uid, this.props.viewing_uid)
+                          alert('Challenge request sent!');
+                        } }>Challenge</button>
                     }
                   </div>
                 </div>
