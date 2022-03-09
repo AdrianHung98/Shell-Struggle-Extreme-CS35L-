@@ -114,22 +114,23 @@ class Profile extends React.Component {
         profile = await getDoc(profileRef);
       }
     }
-    this.setState({ userProfile: profile?.data() });
+    const userProfile = profile?.data();
+    this.setState({ userProfile: userProfile });
     
     // preprocess the turtles into {turtleClass, name} format
-    if (this.state.userProfile?.turtles) {
+    if (userProfile.turtles) {
       const turtles = [];
-      for (const key in this.state.userProfile.turtles) {
+      for (const key in userProfile.turtles) {
         const turtle = {
           turtleClass: await getTurtleClass(key), 
-          name: this.state.userProfile.turtles[key]
+          name: userProfile.turtles[key]
         };
         turtles.push(turtle);
       }
       // render them
       this.setState({ turtles: turtles });
     }
-  }
+}
 
   /**
    * see: 
@@ -207,7 +208,11 @@ class Profile extends React.Component {
                 const newTurtles = turtles.filter(turtle => turtle.turtleClass.className !== turtleClass.className);
                 turtle.name = newName;
                 newTurtles.push(turtle);
-                this.setState({ turtle: newTurtles });
+                const userTurtles = this.state.userProfile.turtles;
+                userTurtles[turtle.turtleClass.className] = newName;
+                const profileRef = await getUserRef(this.props.uid);
+                await updateDoc(profileRef, { turtles: userTurtles });
+                this.setState({ turtles: newTurtles });
               })) }
             </MDBRow>
           </MDBContainer>
