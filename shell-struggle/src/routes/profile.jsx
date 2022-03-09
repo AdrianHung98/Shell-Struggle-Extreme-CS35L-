@@ -163,7 +163,7 @@ class Profile extends React.Component {
                   <p className="mb-1 pb-1" style={{ color: '#2b2a2a' }}>{ this.state.userProfile?.turtles ? Object.keys(this.state.userProfile.turtles).length : '???' } Turtle{ this.state.userProfile?.turtles ? Object.keys(this.state.userProfile.turtles).length === 1 ? '' : 's' : '' } Collected</p>
                   <div className="d-flex pt-1">
                     {
-                      this.props.uid == this.props.viewing_uid ? 
+                      this.props.uid === this.props.viewing_uid ? 
                         <div>
                           <button type="button" className="btn btn-primary flex-grow-1 mb-1" onClick={async () => {
                             const profileRef = await getUserRef(this.props.uid);

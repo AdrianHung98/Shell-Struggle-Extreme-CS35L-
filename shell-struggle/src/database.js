@@ -63,7 +63,7 @@ async function getUIDByUsername(username) {
  */
 
 async function getTurtles(user) {
-    const userRef = getUserRef(user);
+    const userRef = await getUserRef(user);
     const userProfile = await getDoc(userRef);
     if (userProfile.exists()) {
         const userData = userProfile.data();
@@ -179,7 +179,6 @@ async function uploadPicture(user, url) {
 }
 
 async function sendRequest(fromUser, toUser) {
-    console.log("Called sendRequest??");
     const toRef = getUserRef(toUser);
     const toUserProfile = await getDoc(toRef);
     if (toUserProfile.exists()) {
