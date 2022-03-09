@@ -13,7 +13,9 @@ import {
 import 'mdb-react-ui-kit/dist/css/mdb.min.css';
 import 'font-awesome/css/font-awesome.min.css'
 import { useParams } from 'react-router-dom';
-import { getTurtleClass, getUserProfile, renameTurtle, resetUserTurtles, unlockTurtle } from '../database';
+import { getUserRef, getTurtleClass, getUserProfile, renameTurtle, resetUserTurtles, unlockTurtle, incWallet } from '../database';
+import { firestore } from "../firebase";
+import { doc, updateDoc, setDoc, getDoc } from 'firebase/firestore';
 import Navbar from '../navbar';
 
 function make_card(turtleClass, name, editable, renameCallback) {
@@ -45,9 +47,25 @@ function make_card(turtleClass, name, editable, renameCallback) {
   );
 }
 
+function newDateIsOneDayLater(oldDate, newDate) {
+  const old_split = oldDate.split("/");
+  const new_split = newDate.split("/");
+  const microsInDay = 86400000;
+  oldDate = new Date(old_split[2], old_split[1], old_split[0]);
+  newDate = new Date(new_split[2], new_split[1], new_split[0]);
+  const diff = Math.abs(oldDate - newDate);
+  return (diff < 2 * microsInDay) && (diff >= microsInDay)
+}
+
+function useHookToGetViewingUID(props) {
+  const params = useParams();
+  if (Object.keys(params).includes('viewing_uid')) return params.viewing_uid;
+  else return props.uid;
+}
+
 function ProfileWrapper(props) {
   return (
-    <Profile viewing_uid={useParams().viewing_uid} uid={props.uid} />
+    <Profile viewing_uid={ useHookToGetViewingUID(props) } uid={props.uid} email={props.email} />
   );
 }
 
@@ -68,7 +86,35 @@ class Profile extends React.Component {
     // simulate user unlocking the 'Chef' turtle class and naming it 'this is a custom name'
     // await unlockTurtle(this.props.viewing_uid, 'Chef', 'this is another custom name');
     
-    await getUserProfile(this.props.viewing_uid).then(userProfile => this.setState({ userProfile: userProfile }));
+    const d = new Date();
+    const date = String(d.getDate()) + "/" + String(d.getMonth() + 1) + "/" + String(d.getFullYear());
+    const profileRef = await getUserRef(this.props.viewing_uid);
+    let profile = await getDoc(profileRef);
+    if (this.props.uid === this.props.viewing_uid){
+      if (profile.exists()) {
+        if (newDateIsOneDayLater(profile.data().loginDate, date)) {
+          incWallet(this.user.uid, 100);
+        }
+        updateDoc(profileRef, {
+          loginDate: date,
+        });
+      } else {
+        setDoc(profileRef, {
+          username: this.props.email,
+          loginDate: date,
+          wallet: 100,
+          turtles: { Standard: 'Dumbo' }, 
+          icon: "https://img.brickowl.com/files/image_cache/larger/lego-universe-bob-minifigure-25.jpg",
+          requests: []
+        });
+        const userMapRef = await doc(firestore, 'users/userMap');
+        const userMap = (await getDoc(userMapRef)).data();
+        userMap[this.props.email] = this.props.uid;
+        setDoc(userMapRef, userMap);
+        profile = await getDoc(profileRef);
+      }
+    }
+    this.setState({ userProfile: profile?.data() });
     
     // preprocess the turtles into {turtleClass, name} format
     if (this.state.userProfile?.turtles) {

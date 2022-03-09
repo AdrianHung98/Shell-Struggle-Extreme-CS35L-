@@ -198,7 +198,7 @@ async function sendRequest(fromUser, toUser) {
 
 export { 
   addTurtleClass, getTurtleClass, getTurtleClasses, resetTurtleClasses,
-  getUserProfile, getUIDByUsername, 
+  getUserRef, getUserProfile, getUIDByUsername, 
   getTurtles, unlockTurtle, renameTurtle, resetUserTurtles, 
   getWallet, incWallet,
   getNames, setName,

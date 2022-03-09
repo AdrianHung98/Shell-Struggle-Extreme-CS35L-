@@ -51,25 +51,6 @@ class App extends React.Component {
     const date = String(d.getDate()) + "/" + String(d.getMonth() + 1) + "/" + String(d.getFullYear());
 
     let profile = await getDoc(profileRef);
-    if (profile.exists()) {
-      if (newDateIsOneDayLater(profile.data().loginDate, date)) {
-        incWallet(this.uid, 100);
-      }
-      updateDoc(profileRef, {
-        loginDate: date,
-      });
-    } else {
-      setDoc(profileRef, {
-        username: this.props.email,
-        loginDate: date,
-        wallet: 100,
-        turtles: [true, false, false, false, false, false, false, false],
-        names: ["", "", "", "", "", "", "", ""],
-        icon: "https://img.brickowl.com/files/image_cache/larger/lego-universe-bob-minifigure-25.jpg",
-        requests: []
-      });
-      profile = await getDoc(profileRef);
-    }
     this.setState({icon: profile.data().icon});
 
     stopRequestListener = onSnapshot(profileRef, (doc) => {
