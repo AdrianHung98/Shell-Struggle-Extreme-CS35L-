@@ -109,7 +109,8 @@ class App extends React.Component {
           }}
         >
         <Link to="/lobby">Lobby</Link><br/>
-        <Link to="/bestiary">Bestiary</Link>
+        <Link to="/bestiary">Bestiary</Link><br/>
+        <Link to="/shop">Shop</Link>
         </nav>
         <div>Signed in as {this.email}</div>
         <div>ID:{this.uid}</div>

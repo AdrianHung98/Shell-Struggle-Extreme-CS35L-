@@ -1,0 +1,58 @@
+.button {
+    background-color: rgb(224, 224, 243);
+    font-size: xx-large;
+}
+
+
+.title {
+    text-align: center;
+    background-color: gold;
+    color: rgb(51, 41, 23);
+}
+
+.money{
+    font-size: x-large;   
+    background-color: green;
+    border-style: dotted;
+    border-width: medium;
+}
+
+.wallet {
+    margin: auto;
+    color: rgb(0, 0, 0);
+    text-align: center;
+    padding: 1% 5% 1% 5%;
+    background-color: rgb(150, 117, 10);
+    width: fit-content;
+}
+
+#label{
+    font-size: x-large;
+    
+    border: 5px solid;
+    border-bottom: 0px;
+    
+    width:fit-content;
+    margin-bottom: 0;
+
+
+}
+#container {
+    display: flex;
+    border-width: 5px;
+    border-style: solid;
+}
+
+.turtlecard {
+    flex: 1;
+    margin-left: 1%;
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 10px;
+    height: 300px;
+    width: 200px;
+}
+
+#firstcard {
+    margin-left: 0px;
+}
