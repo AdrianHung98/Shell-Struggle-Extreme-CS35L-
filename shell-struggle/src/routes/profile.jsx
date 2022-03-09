@@ -29,6 +29,7 @@ function make_card(turtleClass, name, editable, renameCallback) {
             editable ?
             <i className="fa fa-edit" onClick={ async () => {
               const newName = prompt('Please give this turtle a new name: ', name);
+              if (!newName) return; 
               await renameCallback(turtleClass, newName);
             } }/>
             :
@@ -160,6 +161,7 @@ class Profile extends React.Component {
                             const profileRef = await getUserRef(this.props.uid);
                             const profile = (await getDoc(profileRef)).data();
                             const username = prompt("Please enter a new username: ", profile.username);
+                            if (!username) return;
                             const userMapRef = await doc(firestore, 'users/userMap');
                             const userMap = (await getDoc(userMapRef)).data();
                             if (userMap[username]) {
@@ -178,6 +180,7 @@ class Profile extends React.Component {
                             const profileRef = await getUserRef(this.props.uid);
                             const profile = (await getDoc(profileRef)).data();
                             const icon = prompt("Please enter the url for the new profile picture: ", profile.icon);
+                            if (!icon) return;
                             await updateDoc(profileRef, { icon: icon });
                             const newUserProfile = (await getDoc(profileRef)).data();
                             this.setState({ userProfile: newUserProfile });
