@@ -118,6 +118,8 @@ class Profile extends React.Component {
     const d = new Date();
     const date = String(d.getDate()) + "/" + String(d.getMonth() + 1) + "/" + String(d.getFullYear());
     const profileRef = await getUserRef(this.props.viewing_uid);
+    const userMapRef = await doc(firestore, 'users/userMap');
+    this.userMap = (await getDoc(userMapRef)).data();
 
     let profile = await getDoc(profileRef);
     if (this.props.uid === this.props.viewing_uid){
@@ -137,10 +139,8 @@ class Profile extends React.Component {
           icon: "https://img.brickowl.com/files/image_cache/larger/lego-universe-bob-minifigure-25.jpg",
           requests: []
         });
-        const userMapRef = await doc(firestore, 'users/userMap');
-        const userMap = (await getDoc(userMapRef)).data();
-        userMap[this.props.email] = this.props.uid;
-        setDoc(userMapRef, userMap);
+        this.userMap[this.props.email] = this.props.uid;
+        setDoc(userMapRef, this.userMap);
         profile = await getDoc(profileRef);
       }
       
@@ -202,7 +202,7 @@ class Profile extends React.Component {
             // accept challenge
             profile.requests = profile.requests.filter(request => request !== fromUser);
             const profileRef = await getUserRef(this.props.uid);
-            const turtle = await this.choose(this.props.viewing_uid);
+            const turtle = await this.choose(this.userMap[fromUser]);
             if (!turtle) {
               alert('Invalid turtle selection.');
               return;
