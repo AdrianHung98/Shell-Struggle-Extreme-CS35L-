@@ -17,7 +17,7 @@ import 'font-awesome/css/font-awesome.min.css'
 import { useParams } from 'react-router-dom';
 import { getUserRef, getTurtleClass, getUserProfile, renameTurtle, resetUserTurtles, unlockTurtle, incWallet, sendRequest } from '../database';
 import { firestore } from "../firebase";
-import { doc, updateDoc, setDoc, getDoc } from 'firebase/firestore';
+import { doc, updateDoc, setDoc, getDoc, onSnapshot } from 'firebase/firestore';
 import Navbar from '../navbar';
 
 function make_card(turtleClass, name, editable, renameCallback) {
@@ -120,6 +120,10 @@ class Profile extends React.Component {
         setDoc(userMapRef, userMap);
         profile = await getDoc(profileRef);
       }
+      
+      const requestListener = onSnapshot(profileRef, doc => {
+        this.setState({ userProfile: doc.data() });
+      });
     }
     const userProfile = profile?.data();
     this.setState({ userProfile: userProfile });
