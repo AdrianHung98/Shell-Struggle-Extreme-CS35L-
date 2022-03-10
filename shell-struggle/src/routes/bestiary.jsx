@@ -200,5 +200,4 @@ class Bestiary extends React.Component {
     );
   }
 }
-export {img1, img2, img3, img4, img5, img6, img7, img8, turtleClasses}
-export default {Bestiary}
+export default Bestiary
