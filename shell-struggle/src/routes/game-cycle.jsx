@@ -2,10 +2,10 @@
 
 import React from 'react';
 import { db } from '../firebase';
-import { off, ref, onValue, set } from "firebase/database"; 
+import { off, ref, onValue, set, remove } from "firebase/database"; 
 import { getUserProfile } from '../database';
 import Turtle from '../turtle';
-import { getTurtles } from '../database';
+import { getTurtleClasses } from '../database';
 
 // For later use in observers
 var messageRef;
@@ -13,6 +13,8 @@ var nextMoveRef;
 var redIsNextRef;
 var redHealthRef;
 var blueHealthRef;
+var redTurtleRef;
+var blueTurtleRef;
 
 // Basic Setters
 function setRedIsNext(bool) { set(redIsNextRef, bool); }
@@ -20,6 +22,8 @@ function setNextMove(move) { set(nextMoveRef, move); }
 function setMessage(message) { set(messageRef, message); }
 function setRedHealth(health) { set(redHealthRef, health); }
 function setBlueHealth(health) { set(blueHealthRef, health); }
+function setRedTurtle(class_name) { set(redTurtleRef, class_name); }
+function setBlueTurtle(class_name) { set(blueTurtleRef, class_name); }
 
 function AttackButton(props) {
     return(
@@ -32,7 +36,7 @@ function Player(props) {
     return(
         <div>
             <Turtle 
-            image="https://blog.emojipedia.org/content/images/2020/07/android-11-turtle-emoji.jpg"
+            image={props.image}
             health={props.health} intelligence={props.intelligence} strength={props.strength}>
             </Turtle>
             <div>Player: {props.user} ({props.playerColor})</div>
@@ -48,9 +52,10 @@ class GameCycle extends React.Component {
             redIsNext: true,
             redHealth: 30,
             blueHealth: 30,
-            playerTurtles: null,
-            opponentTurtles: null,
-            room_id: null
+            redTurtle: null,
+            blueTurtle: null,
+            room_id: null,
+            turtleClasses: null
         };
     };
 
@@ -59,17 +64,22 @@ class GameCycle extends React.Component {
 
     // Track message, nextMove, and redIsNext in the realtime database
     async componentDidMount() {
-        // Get player Turtles
-        const playerTurtles = await getTurtles(this.props.uid);
-        this.setState({playerTurtles: playerTurtles});
-        console.log(playerTurtles);
-        //const opponentTurtles = await getTurtles(this.props.opuid);
-        //this.setState({opponentTurtles: opponentTurtles});
-
         // Get shared room ID
         const room_id = (await getUserProfile(this.props.uid)).in_room;
-        console.log(room_id);
         this.setState({ room_id: room_id });
+
+        redTurtleRef = ref(db, room_id + '/redTurtle');
+        blueTurtleRef = ref(db, room_id + '/blueTurtle');
+        // Get Player turtles
+        const playerTurtle = (await getUserProfile(this.props.uid)).using;
+        if (this.props.playerColor === "Red")
+            setRedTurtle(playerTurtle);
+        else
+            setBlueTurtle(playerTurtle);
+
+        // Get entire turtle class
+        const turtleClasses = await getTurtleClasses();
+        this.setState({turtleClasses: turtleClasses});
 
         messageRef = ref(db, room_id + '/message');
         nextMoveRef = ref(db, room_id + '/nextMove');
@@ -101,6 +111,16 @@ class GameCycle extends React.Component {
             this.setState({blueHealth: blueHealth});
         });
 
+        onValue(redTurtleRef, (snapshot) => {
+            let redTurtle = snapshot.val();
+            this.setState({redTurtle: redTurtle});
+        });
+
+        onValue(blueTurtleRef, (snapshot) => {
+            let blueTurtle = snapshot.val();
+            this.setState({blueTurtle: blueTurtle});
+        });
+
         setRedHealth(30);
         setBlueHealth(30);
         setNextMove("none");
@@ -114,6 +134,9 @@ class GameCycle extends React.Component {
         off(redIsNextRef);
         off(redHealthRef);
         off(blueHealthRef);
+        off(redTurtleRef);
+        off(blueTurtleRef);
+        remove(db, this.props.room_id);
     }
 
     processMove(snapshot) {
@@ -146,6 +169,15 @@ class GameCycle extends React.Component {
         return;
     }
 
+    classToIndex(class_name) {
+        const turtleClasses = ["Builder", "Chef", "Cupid", "Mewtwo",
+        "Robot", "Standard", "Tank", "Wizard"];
+        for (let i = 0; i < 8; ++i) {
+            if (turtleClasses[i] === class_name)
+                return i;
+        }
+    }
+
     render() {
         const nextPlayer = this.state.redIsNext ? "Red" : "Blue";
         let turn = <div>It is the {nextPlayer} Player's Turn:</div>;
@@ -169,8 +201,8 @@ class GameCycle extends React.Component {
             </div>
         }
 
-        let playerHealth = 0;
-        let opponentHealth = 0;
+        let playerHealth;
+        let opponentHealth;
         if (this.playerColor === "Red") {
             playerHealth = this.state.redHealth;
             opponentHealth = this.state.blueHealth;
@@ -178,29 +210,76 @@ class GameCycle extends React.Component {
             playerHealth = this.state.blueHealth;
             opponentHealth = this.state.redHealth; 
         }
-        const pTurt = this.state.playerTurtles;
-        const oTurt = this.state.opponentTurtles;
-        if (pTurt === null) //|| oTurt === null)
+        if (this.state.redTurtle === null || this.state.blueTurtle === null)
             return(<div>Loading ... </div>);
-        return (
-        <div>
-            <h1>Shell Struggle EXTREME</h1>
-            <h2>Room: { this.state.room_id }</h2>
-            <Player 
-                user="Sample Opponent" 
-                playerColor={this.opponentColor}
-                health={opponentHealth}>
-            </Player>
-            <Player
-                user="Sample Player"
-                playerColor={this.playerColor}
-                health={playerHealth}>
-            </Player>
-            <div>{this.state.message}</div>
-            {turn}
-            {options}
-        </div>
-    );}
+
+        const turtles = this.state.turtleClasses;
+        const rTurt = this.classToIndex(this.state.redTurtle);
+        const bTurt = this.classToIndex(this.state.blueTurtle);
+        
+        const rSTR = turtles[rTurt].strength;
+        const rINT = turtles[rTurt].intelligence;
+        const rIMG = turtles[rTurt].image;
+
+        const bSTR = turtles[bTurt].strength;
+        const bINT = turtles[bTurt].intelligence;
+        const bIMG = turtles[bTurt].image;
+
+        if (this.playerColor === "Red") {
+            return (
+            <div>
+                <h1>Shell Struggle EXTREME</h1>
+                <h2>Room: { this.state.room_id }</h2>
+                <Player 
+                    user="Sample Opponent" 
+                    playerColor={"Blue"}
+                    health={opponentHealth}
+                    strength={bSTR}
+                    intelligence={bINT}
+                    image={bIMG}
+                    >
+                </Player>
+                <Player
+                    user="Sample Player"
+                    playerColor={"Red"}
+                    health={playerHealth}
+                    strength={rSTR}
+                    intelligence={rINT}
+                    image={rIMG}>
+                </Player>
+                <div>{this.state.message}</div>
+                {turn}
+                {options}
+            </div>
+            );
+        } else {
+            return (
+                <div>
+                    <h1>Shell Struggle EXTREME</h1>
+                    <h2>Room: { this.state.room_id }</h2>
+                    <Player 
+                        user="Sample Opponent" 
+                        playerColor={"Red"}
+                        health={opponentHealth}strength={rSTR}
+                        intelligence={rINT}
+                        image={rIMG}
+                        >
+                    </Player>
+                    <Player
+                        user="Sample Player"
+                        playerColor={"Blue"}
+                        health={playerHealth}
+                        strength={bSTR}
+                        intelligence={bINT}
+                        image={bIMG}>
+                    </Player>
+                    <div>{this.state.message}</div>
+                    {turn}
+                    {options}
+                </div>
+                );
+        }
+    }
 };
 
 export default GameCycle;
