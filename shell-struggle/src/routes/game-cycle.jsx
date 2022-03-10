@@ -7,15 +7,12 @@ import { getUserProfile } from '../database';
 import Turtle from '../turtle';
 import { getTurtles } from '../database';
 
-// This should be passed as props
-const roomID = 'room';
-
 // For later use in observers
-var messageRef = ref(db, roomID + '/message');
-var nextMoveRef = ref(db, roomID + '/nextMove');
-var redIsNextRef = ref(db, roomID + '/redIsNext');
-var redHealthRef = ref(db, roomID + '/redHealth');
-var blueHealthRef = ref(db, roomID + '/blueHealth');
+var messageRef;
+var nextMoveRef;
+var redIsNextRef;
+var redHealthRef;
+var blueHealthRef;
 
 // Basic Setters
 function setRedIsNext(bool) { set(redIsNextRef, bool); }
@@ -55,10 +52,6 @@ class GameCycle extends React.Component {
             opponentTurtles: null,
             room_id: null
         };
-        setRedHealth(30);
-        setBlueHealth(30);
-        setNextMove("none");
-        setMessage("");
     };
 
     playerColor = this.props.playerColor;
@@ -67,14 +60,22 @@ class GameCycle extends React.Component {
     // Track message, nextMove, and redIsNext in the realtime database
     async componentDidMount() {
         // Get player Turtles
-        const playerTurtles = await getTurtles(this.props.puid);
+        const playerTurtles = await getTurtles(this.props.uid);
         this.setState({playerTurtles: playerTurtles});
-        const opponentTurtles = await getTurtles(this.props.opuid);
-        this.setState({opponentTurtles: opponentTurtles});
+        console.log(playerTurtles);
+        //const opponentTurtles = await getTurtles(this.props.opuid);
+        //this.setState({opponentTurtles: opponentTurtles});
 
         // Get shared room ID
         const room_id = (await getUserProfile(this.props.uid)).in_room;
+        console.log(room_id);
         this.setState({ room_id: room_id });
+
+        messageRef = ref(db, room_id + '/message');
+        nextMoveRef = ref(db, room_id + '/nextMove');
+        redIsNextRef = ref(db, room_id + '/redIsNext');
+        redHealthRef = ref(db, room_id + '/redHealth');
+        blueHealthRef = ref(db, room_id + '/blueHealth');
 
         onValue(nextMoveRef, (snapshot) => {
             this.processMove(snapshot);   
@@ -99,6 +100,11 @@ class GameCycle extends React.Component {
             let blueHealth = snapshot.val();
             this.setState({blueHealth: blueHealth});
         });
+
+        setRedHealth(30);
+        setBlueHealth(30);
+        setNextMove("none");
+        setMessage("");
     }
 
     // Stop tracking
@@ -174,7 +180,7 @@ class GameCycle extends React.Component {
         }
         const pTurt = this.state.playerTurtles;
         const oTurt = this.state.opponentTurtles;
-        if (pTurt === null || oTurt === null)
+        if (pTurt === null) //|| oTurt === null)
             return(<div>Loading ... </div>);
         return (
         <div>

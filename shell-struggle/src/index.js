@@ -25,10 +25,8 @@ onAuthStateChanged(auth, (user) => {
           <Route exact path="/select-screen" element={<App uid={uid} email={email}/>}/>
           <Route exact path="/bestiary" element={<Bestiary uid={uid}/>}/>
           <Route exact path="/profile/:viewing_uid" element={<ProfileWrapper uid={uid} email={email}/>}/>
-          <Route path="gameCycleRed" element={<GameCycle playerColor="Red" opponentColor="Blue"
-            puid={uid} ouid="witterzane@gmail.com" class="standard"/>}/>
-          <Route path="gameCycleBlue" element={<GameCycle playerColor="Blue" opponentColor="Red"
-            puid={uid} ouid="witterzane@gmail.com" class="standard"/>}/>
+          <Route path="gameCycleRed" element={<GameCycle playerColor="Red" opponentColor="Blue" uid={uid}/>}/>
+          <Route path="gameCycleBlue" element={<GameCycle playerColor="Blue" opponentColor="Red" uid={uid}/>}/>
           <Route exact path="/shop"element={<Shop user={user}/>}/>
         </Routes>
       </BrowserRouter>,
