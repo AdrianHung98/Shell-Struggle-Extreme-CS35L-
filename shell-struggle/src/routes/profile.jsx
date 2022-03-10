@@ -8,14 +8,17 @@ import {
   MDBCardImage, 
   MDBContainer, 
   MDBRow, 
-  MDBCol 
+  MDBCol, 
+  MDBListGroup, 
+  MDBListGroupItem 
 } from 'mdb-react-ui-kit';
 import 'mdb-react-ui-kit/dist/css/mdb.min.css';
 import 'font-awesome/css/font-awesome.min.css'
 import { useParams } from 'react-router-dom';
-import { getUserRef, getTurtleClass, getUserProfile, renameTurtle, resetUserTurtles, unlockTurtle, incWallet } from '../database';
-import { firestore } from "../firebase";
-import { doc, updateDoc, setDoc, getDoc } from 'firebase/firestore';
+import { getUIDByUsername, getUserRef, getTurtleClass, getUserProfile, renameTurtle, resetUserTurtles, unlockTurtle, incWallet, sendRequest } from '../database';
+import { db, firestore } from "../firebase";
+import { ref, set } from "firebase/database"
+import { doc, updateDoc, setDoc, getDoc, onSnapshot } from 'firebase/firestore';
 import Navbar from '../navbar';
 
 function make_card(turtleClass, name, editable, renameCallback) {
@@ -84,6 +87,27 @@ class Profile extends React.Component {
     };
   }
 
+  async choose(uid) {
+    const opponent = (await getUserProfile(uid)).username;
+    const me = await getUserProfile(this.props.uid);
+    let msg = `Which turtle do you want to duel ${opponent} with?\nChoose from: \n`;
+    if (!me.turtles) {
+      alert('Turtles not loaded.');
+      return null;
+    }
+    for (const turtleClass in me.turtles) {
+      msg += `  ${me.turtles[turtleClass]}\n`;
+    }
+    const selection = prompt(msg, me.turtles['Standard']);
+    for (const turtleClass in me.turtles) {
+      console.log(selection);
+      if (selection === me.turtles[turtleClass]) {
+        return (await getTurtleClass(turtleClass)).className;
+      }
+    }
+    return null;
+  }
+
   async componentDidMount() {
     // await resetUserTurtles(this.props.viewing_uid);
     // simulate user unlocking the 'Standard' turtle class and naming it 'this is a custom name'
@@ -94,6 +118,7 @@ class Profile extends React.Component {
     const d = new Date();
     const date = String(d.getDate()) + "/" + String(d.getMonth() + 1) + "/" + String(d.getFullYear());
     const profileRef = await getUserRef(this.props.viewing_uid);
+
     let profile = await getDoc(profileRef);
     if (this.props.uid === this.props.viewing_uid){
       if (profile.exists()) {
@@ -118,6 +143,7 @@ class Profile extends React.Component {
         setDoc(userMapRef, userMap);
         profile = await getDoc(profileRef);
       }
+      
     }
     const userProfile = profile?.data();
     this.setState({ userProfile: userProfile });
@@ -136,13 +162,68 @@ class Profile extends React.Component {
       // render them
       this.setState({ turtles: turtles });
     }
-}
 
+    const userProfileRef = await getUserRef(this.props.uid);
+    const requestListener = onSnapshot(userProfileRef, async doc => {
+      const newProfile = doc.data();
+      // challege was accepted
+      if (newProfile.requests.includes(newProfile.username)) {
+        newProfile.requests = newProfile.requests.filter(request => request !== newProfile.username);
+        await updateDoc(userProfileRef, { requests: newProfile.requests, in_room: newProfile.username });
+        window.location.href = '/gameCycleRed';
+      }
+      if (this.props.uid === this.props.viewing_uid) {
+        this.setState({ userProfile: doc.data() });
+      }
+    });
+  }
+  
   /**
    * see: 
    * https://mdbootstrap.com/docs/standard/extended/profiles/
    */
   render() {
+    const requests = [];
+    const profile = this.state.userProfile;
+    if (profile && this.props.uid === this.props.viewing_uid) {
+      for (const fromUser of profile.requests) {
+        const request = <MDBListGroupItem key={fromUser}>
+          {`${fromUser} challenges you to a duel!`}
+          <button type="button" className="btn-sm me-2" style={{ float: 'right' }} onClick={ async () => {
+            // decline challenge
+            profile.requests = profile.requests.filter(request => request !== fromUser);
+            const profileRef = await getUserRef(this.props.uid);
+            await updateDoc(profileRef, { requests: profile.requests });
+            this.setState({ userProfile: profile });
+            alert('Challenge declined.');
+          } }>Decline</button>
+          <button type="button" className="btn-sm btn-primary me-2" style={{ float: 'right' }} onClick={ async () => { 
+            // accept challenge
+            profile.requests = profile.requests.filter(request => request !== fromUser);
+            const profileRef = await getUserRef(this.props.uid);
+            const turtle = await this.choose(this.props.viewing_uid);
+            if (!turtle) {
+              alert('Invalid turtle selection.');
+              return;
+            }
+            await updateDoc(profileRef, { requests: profile.requests, in_room: fromUser, using: turtle });
+            this.setState({ userProfile: profile });
+            await sendRequest(await getUIDByUsername(fromUser), await getUIDByUsername(fromUser));
+            window.location.href = '/gameCycleBlue';
+          } }>Accept</button>
+        </MDBListGroupItem>;
+        requests.push(request);
+      }
+    }
+    const renderRequests = this.props.uid === this.props.viewing_uid ? 
+      <div>
+        <hr />
+
+        <MDBListGroup className="list-group-flush" style={{ minWidth: '22rem' }}>
+          { requests }
+        </MDBListGroup>
+      </div>
+      : null;
     return (
       <div>
         <header>
@@ -163,7 +244,7 @@ class Profile extends React.Component {
                   <p className="mb-1 pb-1" style={{ color: '#2b2a2a' }}>{ this.state.userProfile?.turtles ? Object.keys(this.state.userProfile.turtles).length : '???' } Turtle{ this.state.userProfile?.turtles ? Object.keys(this.state.userProfile.turtles).length === 1 ? '' : 's' : '' } Collected</p>
                   <div className="d-flex pt-1">
                     {
-                      this.props.uid == this.props.viewing_uid ? 
+                      this.props.uid === this.props.viewing_uid ? 
                         <div>
                           <button type="button" className="btn btn-primary flex-grow-1 mb-1" onClick={async () => {
                             const profileRef = await getUserRef(this.props.uid);
@@ -195,7 +276,18 @@ class Profile extends React.Component {
                           }}>Change Profile Picture</button>
                         </div>
                       : 
-                        <button type="button" className="btn btn-primary flex-grow-1">Challenge</button>
+                        <button type="button" className="btn btn-primary flex-grow-1" onClick={ async () => {
+                          const turtle = await this.choose(this.props.viewing_uid);
+                          console.log(turtle);
+                          if (!turtle) {
+                            alert('Invalid turtle selection.');
+                            return;
+                          }
+                          const profileRef = await getUserRef(this.props.uid);
+                          await updateDoc(profileRef, { using: turtle });
+                          await sendRequest(this.props.uid, this.props.viewing_uid)
+                          alert('Challenge request sent!');
+                        } }>Challenge</button>
                     }
                   </div>
                 </div>
@@ -228,6 +320,8 @@ class Profile extends React.Component {
             </MDBRow>
           </MDBContainer>
         </div>
+        
+        {renderRequests}
       </div>
     );
   }
