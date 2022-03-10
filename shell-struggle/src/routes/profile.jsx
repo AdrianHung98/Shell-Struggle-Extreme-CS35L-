@@ -241,7 +241,7 @@ class Profile extends React.Component {
                 <div className="flex-grow-1 ms-3">
                   <h5 className="mb-1">{ this.state.userProfile?.username }</h5>
                   
-                  <p className="mb-0 pb-0" style={{ color: '#2b2a2a' }}><i className="fa fa-money" /> { this.state.userProfile?.wallet }</p>
+                  <p className="mb-0 pb-0" style={{ color: '#2b2a2a' }}>{ this.state.userProfile?.wallet } <i className="fa fa-money" /></p>
                   <p className="mb-1 pb-1" style={{ color: '#2b2a2a' }}>{ this.state.userProfile?.turtles ? Object.keys(this.state.userProfile.turtles).length : '???' } Turtle{ this.state.userProfile?.turtles ? Object.keys(this.state.userProfile.turtles).length === 1 ? '' : 's' : '' } Collected</p>
                   <div className="d-flex pt-1">
                     {

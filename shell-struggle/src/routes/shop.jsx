@@ -6,6 +6,7 @@ import {
     MDBCardBody, 
     MDBCardFooter, 
     MDBCardTitle,  
+    MDBCardText, 
     MDBCardImage, 
     MDBContainer, 
     MDBRow, 
@@ -116,14 +117,14 @@ function computePrice(turtleClass){
 
 
 function make_card(userID, turtleClass, isLocked) {
-    const price = isLocked ? <MDBCardFooter> Price: ${computePrice(turtleClass)}</MDBCardFooter> : null;
+    const price = isLocked ? <MDBCardFooter> Price: {computePrice(turtleClass)} <i className="fa fa-money" /></MDBCardFooter> : null;
     return (
       <MDBCol lg={true} style={{marginBottom: '1.5rem'}} className='col-3' key={turtleClass.className} id="fitheight">
         <MDBCard style={{ width: '18rem' }} className='h-100'>
         <MDBCardImage position='top' src={turtleClass.image} />
           <MDBCardBody>
             <MDBCardTitle>Class: {turtleClass.className}</MDBCardTitle>
-            <MDBCardTitle>HP {turtleClass.health} / STR {turtleClass.strength} / INT {turtleClass.intelligence}</MDBCardTitle>
+            <MDBCardText>HP {turtleClass.health} / STR {turtleClass.strength} / INT {turtleClass.intelligence}</MDBCardText>
           </MDBCardBody>
           {price}
         </MDBCard>
@@ -235,27 +236,37 @@ class Shop extends React.Component {
         return (
         <div>
             <header>
-          <Navbar uid={ this.state.user.uid }/>
-        </header>
-        <div
-            className='p-5 text-center bg-image'
-            style={{ backgroundImage: "url('https://wallpaperaccess.com/full/2819122.jpg')", height: 400 }}
-          ></div>
-            <h1 className="title">Hello,  {this.state.username}! Welcome to the Shop</h1>
-            <h3 className="wallet">Your Balance: ${this.state.balance}</h3>
+              <Navbar uid={ this.state.user.uid }/>
+          
+              <div
+                  className='p-5 text-center bg-image'
+                  style={{ backgroundImage: "url('https://wallpaperaccess.com/full/2819122.jpg')", height: 400 }}
+              >
+                <div className='mask' style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}>
+                  <div className='d-flex justify-content-center align-items-center h-100'>
+                    <div className='text-white'>
+                      <h1 className='mb-3'>Hello, {this.state.username}! Welcome to the Shop!</h1>
+                      <h2>{ `${this.state.balance}` } <i className="fa fa-money" onClick={ () => this.changeBalance(10) }/></h2>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </header>
+
+            <h1 className="title text-black pb-1"></h1>
             <br/>
-            <div id="label">Owned Turtles</div>
-            <div id="container">
-                <MDBContainer id="flex">
+            <h1 style={{ textAlign: 'center' }}>Owned Turtles</h1>
+            <div>
+                <MDBContainer className="container-fluid">
                     <MDBRow>
                     { this.state.unlockedCollection.map(turtle => <div key={turtle.className} id="flexchild">{make_card(this.state.user.uid, turtle,false)}</div>)}
                     </MDBRow>
                 </MDBContainer>
             </div>
-            <br/>
-            <div id="label">Locked Turtles</div>
-            <div id="container">
-                <MDBContainer id="flex">
+            <hr/>
+            <h1 style={{ textAlign: 'center' }}>Locked Turtles</h1>
+            <div>
+                <MDBContainer className="container-fluid">
                     <MDBRow>
                     { this.state.lockedCollection.map(turtle => <div id="flexchild" key={turtle.className} onClick={() => this.buyTurtle(turtle)}>{make_card(this.state.user.uid, turtle,true)}</div>)}
                     </MDBRow>
