@@ -246,9 +246,7 @@ class Shop extends React.Component {
                   <div className='d-flex justify-content-center align-items-center h-100'>
                     <div className='text-white'>
                       <h1 className='mb-3'>Hello, {this.state.username}! Welcome to the Shop!</h1>
-                      <h2>{ `${this.state.balance}` } <i className="fa fa-money" /></h2>
-
-
+                      <h2>{ `${this.state.balance}` } <i className="fa fa-money" onClick={ () => this.changeBalance(10) }/></h2>
                     </div>
                   </div>
                 </div>
