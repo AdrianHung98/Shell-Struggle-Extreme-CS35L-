@@ -119,7 +119,7 @@ const turtleClasses = [
     className: 'Mewtwo', 
     health: 5, 
     strength: 5, 
-    intelligence: 20, 
+    intelligence: 30, 
     lore: '"Also known as #150, Mewtwo was created by a scientist after years of horrific gene splicing and DNA engineering experiments" - Turtlédex entry', 
     image: img8, 
     id: 7
@@ -200,5 +200,5 @@ class Bestiary extends React.Component {
     );
   }
 }
-
-export default Bestiary
+export {img1, img2, img3, img4, img5, img6, img7, img8, turtleClasses}
+export default {Bestiary}

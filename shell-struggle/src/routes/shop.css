@@ -56,3 +56,19 @@
 #firstcard {
     margin-left: 0px;
 }
+
+#flex {
+    max-width: 100%;
+    display: flex;
+}
+
+#flexchild{
+    flex: 1;
+    flex-grow: 0;
+    
+}
+
+
+#fitheight {
+    height:350px;
+}
