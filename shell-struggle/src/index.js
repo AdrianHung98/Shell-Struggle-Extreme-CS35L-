@@ -9,6 +9,7 @@ import GameCycle from './routes/game-cycle.jsx';
 import Bestiary from './routes/bestiary.jsx';
 import ProfileWrapper from './routes/profile.jsx';
 import Shop from './routes/shop.jsx';
+import GameCPU from './routes/game-cpu.jsx';
 import './index.css';
 
 onAuthStateChanged(auth, (user) => {
@@ -29,6 +30,7 @@ onAuthStateChanged(auth, (user) => {
             puid={uid} ouid="witterzane@gmail.com" class="standard"/>}/>
           <Route path="gameCycleBlue" element={<GameCycle uid={uid} playerColor="Blue" opponentColor="Red"
             puid={uid} ouid="witterzane@gmail.com" class="standard"/>}/>
+          <Route path="gameCPU" element={<GameCPU uid={uid}/>}/>
           <Route exact path="/shop"element={<Shop user={user}/>}/>
         </Routes>
       </BrowserRouter>,

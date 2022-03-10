@@ -32,7 +32,8 @@ class App extends React.Component {
         <Link to={ `/profile/${this.props.uid}` }>Profile</Link><br/>
         <Link to="/shop">Shop</Link><br/>
         <Link to="/gameCycleRed">Red Team</Link><br/>
-        <Link to="/gameCycleBlue">Blue Team</Link>
+        <Link to="/gameCycleBlue">Blue Team</Link><br/>
+        <Link to ="/gameCPU">Fight a CPU opponent</Link>
         </nav>
         <div>Signed in as {this.email}</div>
         <div>ID:{this.uid}</div>
