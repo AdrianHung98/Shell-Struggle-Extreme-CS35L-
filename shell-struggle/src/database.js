@@ -63,7 +63,7 @@ async function getUIDByUsername(username) {
  */
 
 async function getTurtles(user) {
-    const userRef = getUserRef(user);
+    const userRef = await getUserRef(user);
     const userProfile = await getDoc(userRef);
     if (userProfile.exists()) {
         const userData = userProfile.data();
@@ -193,7 +193,7 @@ async function sendRequest(fromUID, toUID) {
         }
         updateDoc(toRef, {requests: requests});
     } else {
-        console.log("ERROR in getNames(): uid", toUID, "does not exist"); return false;
+        console.log("ERROR in sendRequest(): user", toUser, "does not exist"); return false;
     }
 }
 

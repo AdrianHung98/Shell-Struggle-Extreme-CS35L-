@@ -5,71 +5,42 @@ import { db } from '../firebase';
 import { off, ref, onValue, set } from "firebase/database"; 
 import { getUserProfile } from '../database';
 import Turtle from '../turtle';
+import { getTurtles } from '../database';
 
-const roomID = 'room'
+// This should be passed as props
+const roomID = 'room';
 
+// For later use in observers
 var messageRef = ref(db, roomID + '/message');
 var nextMoveRef = ref(db, roomID + '/nextMove');
 var redIsNextRef = ref(db, roomID + '/redIsNext');
 var redHealthRef = ref(db, roomID + '/redHealth');
 var blueHealthRef = ref(db, roomID + '/blueHealth');
 
-function setRedIsNext(bool) {
-    set(redIsNextRef, {
-        redIsNext: bool
-    });
-}
-
-function setNextMove(move) {
-    set(nextMoveRef, {
-        nextMove: move
-    });
-}
-
-function setMessage(message) {
-    set(messageRef, {
-        message: message     
-    });
-}
-
-function setRedHealth(health) {
-    set(redHealthRef, {
-        redHealth: health
-    });
-}
-
-function setBlueHealth(health) {
-    set(blueHealthRef, {
-        blueHealth: health
-    });
-}
+// Basic Setters
+function setRedIsNext(bool) { set(redIsNextRef, bool); }
+function setNextMove(move) { set(nextMoveRef, move); }
+function setMessage(message) { set(messageRef, message); }
+function setRedHealth(health) { set(redHealthRef, health); }
+function setBlueHealth(health) { set(blueHealthRef, health); }
 
 function AttackButton(props) {
     return(
-        <button 
-            className="attack" 
-            onClick={() => {
-                setNextMove(props.attack);
-            }}>
-                {props.attack}
+        <button className="attack" onClick={() => { setNextMove(props.attack);}}>
+            {props.attack}
         </button>
-    );
-}
+);}
 
 function Player(props) {
     return(
         <div>
             <Turtle 
             image="https://blog.emojipedia.org/content/images/2020/07/android-11-turtle-emoji.jpg"
-            health={props.health}
-            intelligence="10"
-            strength="10"
-            >
+            health={props.health} intelligence={props.intelligence} strength={props.strength}>
             </Turtle>
             <div>Player: {props.user} ({props.playerColor})</div>
         </div>
-    );
-}
+);}
 
 class GameCycle extends React.Component {
     constructor(props) {
@@ -80,6 +51,8 @@ class GameCycle extends React.Component {
             redIsNext: true,
             redHealth: 30,
             blueHealth: 30,
+            playerTurtles: null,
+            opponentTurtles: null,
             room_id: null
         };
         setRedHealth(30);
@@ -93,54 +66,37 @@ class GameCycle extends React.Component {
 
     // Track message, nextMove, and redIsNext in the realtime database
     async componentDidMount() {
+        // Get player Turtles
+        const playerTurtles = await getTurtles(this.props.puid);
+        this.setState({playerTurtles: playerTurtles});
+        const opponentTurtles = await getTurtles(this.props.opuid);
+        this.setState({opponentTurtles: opponentTurtles});
+
+        // Get shared room ID
         const room_id = (await getUserProfile(this.props.uid)).in_room;
         this.setState({ room_id: room_id });
 
+        onValue(nextMoveRef, (snapshot) => {
+            this.processMove(snapshot);   
+        });
+
         onValue(messageRef, (snapshot) => {
-            let message = snapshot.val().message;
+            let message = snapshot.val();
             this.setState({message: message});
         });
 
-        // Process new move
-        onValue(nextMoveRef, (snapshot) => {
-            let nextMove = (snapshot.val()).nextMove;
-            this.setState({nextMove: nextMove});
-            if (nextMove === "none") {
-                return;
-            }
-            const nextPlayer = this.state.redIsNext ? "Red" : "Blue";
-            if (nextPlayer === "Red") {
-                let health = this.state.blueHealth - 10;
-                if (health <= 0) {
-                    health = 0;
-                    setMessage("Red Player Won!");
-                }
-                setBlueHealth(health);
-            } else {
-                let health = this.state.redHealth - 10;
-                if (health <= 0) {
-                    health = 0;
-                    setMessage("Blue Player Won!");
-                }
-                setRedHealth(health);
-            }
-            if (nextPlayer === this.playerColor) {
-                this.endTurn();
-            }
-        });
-
         onValue(redIsNextRef, (snapshot) => {
-            let redIsNext = snapshot.val().redIsNext;
+            let redIsNext = snapshot.val();
             this.setState({redIsNext: redIsNext});
         });
 
         onValue(redHealthRef, (snapshot) => {
-            let redHealth = snapshot.val().redHealth;
+            let redHealth = snapshot.val();
             this.setState({redHealth: redHealth});
         });
 
         onValue(blueHealthRef, (snapshot) => {
-            let blueHealth = snapshot.val().blueHealth;
+            let blueHealth = snapshot.val();
             this.setState({blueHealth: blueHealth});
         });
     }
@@ -152,6 +108,31 @@ class GameCycle extends React.Component {
         off(redIsNextRef);
         off(redHealthRef);
         off(blueHealthRef);
+    }
+
+    processMove(snapshot) {
+        let nextMove = snapshot.val();
+        this.setState({nextMove: nextMove});
+        if (nextMove === "none")
+            return;
+
+        const nextPlayer = this.state.redIsNext ? "Red" : "Blue";
+        if (nextPlayer === "Red") {
+            let health = this.state.blueHealth - 10;
+            if (health <= 0) {
+                health = 0; setMessage("Red Player Won!");
+            }
+            setBlueHealth(health);
+        } else {
+            let health = this.state.redHealth - 10;
+            if (health <= 0) {
+                health = 0; setMessage("Blue Player Won!");
+            }
+            setRedHealth(health);
+        }
+        if (nextPlayer === this.playerColor) {
+            this.endTurn();
+        }
     }
 
     endTurn() {
@@ -191,7 +172,10 @@ class GameCycle extends React.Component {
             playerHealth = this.state.blueHealth;
             opponentHealth = this.state.redHealth; 
         }
-
+        const pTurt = this.state.playerTurtles;
+        const oTurt = this.state.opponentTurtles;
+        if (pTurt === null || oTurt === null)
+            return(<div>Loading ... </div>);
         return (
         <div>
             <h1>Shell Struggle EXTREME</h1>
