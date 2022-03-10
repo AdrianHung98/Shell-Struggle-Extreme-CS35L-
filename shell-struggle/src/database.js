@@ -115,7 +115,7 @@ async function unlockTurtle(user, turtleClass, name) {
 }
 
 async function getWallet (user) {
-    const userRef = getUserRef(user);
+    const userRef = await getUserRef(user);
     const userProfile = await getDoc(userRef);
     if (userProfile.exists()) {
         const userData = userProfile.data();
@@ -132,7 +132,7 @@ async function incWallet (user, amount) {
     if (newAmount < 0) {
         console.log("ERROR in incWallet(): insufficient funcds"); return false;
     }
-    const userProfile = getUserRef(user);
+    const userProfile = await getUserRef(user);
     const newWallet = {
         wallet: newAmount
     }
@@ -156,7 +156,7 @@ async function getNames(user) {
 }
 
 async function setName(user, index, name) {
-    const userRef = getUserRef(user);
+    const userRef = await getUserRef(user);
     let namesArray = await getNames(user);
     if (namesArray === false) {return false}
     namesArray[index] = name;
