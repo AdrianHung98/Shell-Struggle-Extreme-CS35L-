@@ -15,6 +15,8 @@ import './shop.css';
 import 'mdb-react-ui-kit/dist/css/mdb.min.css';
 import { incWallet, getUserProfile, unlockTurtle} from "../database";
 //import {img1, img2, img3, img4, img5, img6, img7, img8, turtleClasses} from './bestiary.jsx';
+import Navbar from '../navbar';
+
 
 const img1 = 'https://images.squarespace-cdn.com/content/v1/5369465be4b0507a1fd05af0/1528837069483-LD1R6EJDDHBY8LBPVHIU/randall-ruiz-272502.jpg';
 const img2 = 'https://news.stanford.edu/wp-content/uploads/2021/04/Sea-Turtle.jpg';
@@ -23,7 +25,7 @@ const img4 = 'https://i.guim.co.uk/img/media/b3e038f98ce2cde24e5c5bb7e8200e65bbc
 const img5 = 'https://worldbirds.com/wp-content/uploads/2020/05/turtle5.webp';
 const img6 = 'https://files.worldwildlife.org/wwfcmsprod/images/Green_Sea_Turtle_WW1113937/magazine_small/9ryljjoi8x_Green_Sea_Turtle_WW1113937.jpg';
 const img7 = 'https://earthjustice.org/sites/default/files/styles/image_800x600/public/seaturtle01_0.jpg?itok=d7yk0D39';
-const img8 = 'https://media.npr.org/assets/img/2021/10/12/ap21285681295049_wide-0b75857d0410d370a5aa3d799bc326a2819d98be-s900-c85.webp';
+const img8 = 'https://magnetricity.files.wordpress.com/2019/04/mewtwo-plush-detective-pikachu-posable.png';
 
 
 const turtleClasses = [
@@ -229,13 +231,16 @@ class Shop extends React.Component {
     }
     
     render() {
-       const profileURL = "/profile/" + this.state.user.uid;
+       //const profileURL = "/profile/" + this.state.user.uid;
         return (
         <div>
-            <nav>
-                <a className="button" href={profileURL}>Go back to profile</a>
-                <button className="money" style={{float:'right'}} onClick={() => this.changeBalance(10)}>Free Money</button>
-            </nav>
+            <header>
+          <Navbar uid={ this.state.user.uid }/>
+        </header>
+        <div
+            className='p-5 text-center bg-image'
+            style={{ backgroundImage: "url('https://wallpaperaccess.com/full/2819122.jpg')", height: 400 }}
+          ></div>
             <h1 className="title">Hello,  {this.state.username}! Welcome to the Shop</h1>
             <h3 className="wallet">Your Balance: ${this.state.balance}</h3>
             <br/>

@@ -41,6 +41,7 @@
     display: flex;
     border-width: 5px;
     border-style: solid;
+    background-image: url('https://wallpaperaccess.com/full/2118486.jpg');
 }
 
 .turtlecard {
@@ -63,6 +64,7 @@
 }
 
 #flexchild{
+    margin-top:2%;
     flex: 1;
     flex-grow: 0;
     
@@ -70,5 +72,5 @@
 
 
 #fitheight {
-    height:350px;
+    height:400px;
 }

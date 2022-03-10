@@ -48,7 +48,7 @@ const img4 = 'https://i.guim.co.uk/img/media/b3e038f98ce2cde24e5c5bb7e8200e65bbc
 const img5 = 'https://worldbirds.com/wp-content/uploads/2020/05/turtle5.webp';
 const img6 = 'https://files.worldwildlife.org/wwfcmsprod/images/Green_Sea_Turtle_WW1113937/magazine_small/9ryljjoi8x_Green_Sea_Turtle_WW1113937.jpg';
 const img7 = 'https://earthjustice.org/sites/default/files/styles/image_800x600/public/seaturtle01_0.jpg?itok=d7yk0D39';
-const img8 = 'https://media.npr.org/assets/img/2021/10/12/ap21285681295049_wide-0b75857d0410d370a5aa3d799bc326a2819d98be-s900-c85.webp';
+const img8 = 'https://magnetricity.files.wordpress.com/2019/04/mewtwo-plush-detective-pikachu-posable.png';
 
 
 const turtleClasses = [
