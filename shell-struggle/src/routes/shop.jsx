@@ -17,6 +17,9 @@ import 'mdb-react-ui-kit/dist/css/mdb.min.css';
 import {getWallet, incWallet, getTurtles, getUserProfile, getTurtleClasses, getTurtleClass, unlockTurtle} from "../database";
 import {img1, img2, img3, img4, img5, img6, img7, img8, turtleClasses} from './bestiary';
 
+//hard-coding in the default order:
+const default_ordering = ['Standard', 'Builder', 'Chef', 'Tank', 'Wizard', 'Cupid', 'Robot', 'Mewtwo'];
+
 function computePrice(turtleClass){
     const health = 5;
     const intelligence =6;
@@ -67,7 +70,26 @@ class Shop extends React.Component {
     }
 
     async refreshScreen(){
-        
+        const profile = await getUserProfile(this.state.user.uid);
+        this.setState({
+            username: profile.username,
+            balance: profile.wallet,
+            unlockedCollection: [],
+            lockedCollection: []
+        });
+
+        //initializing locked and unlocked collections
+        for( let i =0; i < default_ordering.length; i++){
+            const turtle = turtleClasses[i];
+            if(profile.turtles[default_ordering[i]]){
+                this.setState(state => ({unlockedCollection: state.unlockedCollection.concat([turtle])}));
+            }
+            else{
+                this.setState(state => ({lockedCollection: state.lockedCollection.concat([turtle])}));
+            }
+            
+        }   
+
     }
 
     async buyTurtle(turtleClass){
@@ -105,10 +127,6 @@ class Shop extends React.Component {
             balance: profile.wallet
         });
 
-
-        //hard-coding in the default order:
-        const default_ordering = ['Standard', 'Builder', 'Chef', 'Tank', 'Wizard', 'Cupid', 'Robot', 'Mewtwo'];
-        
         //initializing locked and unlocked collections
         for( let i =0; i < default_ordering.length; i++){
             const turtle = turtleClasses[i];
@@ -131,7 +149,7 @@ class Shop extends React.Component {
         return (
         <div>
             <nav>
-                <a className="button" href={profileURL}>Go back</a>
+                <a className="button" href={profileURL}>Go back to profile</a>
                 <button className="money" style={{float:'right'}} onClick={() => this.changeBalance(10)}>Free Money</button>
             </nav>
             <h1 className="title">Hello,  {this.state.username}! Welcome to the Shop</h1>
