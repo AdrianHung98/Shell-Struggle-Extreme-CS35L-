@@ -170,7 +170,7 @@ class Profile extends React.Component {
       // challege was accepted
       if (newProfile.requests.includes(newProfile.username)) {
         newProfile.requests = newProfile.requests.filter(request => request !== newProfile.username);
-        await updateDoc(userProfileRef, { requests: newProfile.requests, in_room: newProfile.username });
+        await updateDoc(userProfileRef, { requests: newProfile.requests, in_room: this.userMap[newProfile.username] });
         window.location.href = '/gameCycleRed';
       }
       if (this.props.uid === this.props.viewing_uid) {
@@ -207,7 +207,7 @@ class Profile extends React.Component {
               alert('Invalid turtle selection.');
               return;
             }
-            await updateDoc(profileRef, { requests: profile.requests, in_room: fromUser, using: turtle });
+            await updateDoc(profileRef, { requests: profile.requests, in_room: this.userMap[fromUser], using: turtle });
             this.setState({ userProfile: profile });
             await sendRequest(await getUIDByUsername(fromUser), await getUIDByUsername(fromUser));
             window.location.href = '/gameCycleBlue';
