@@ -83,25 +83,25 @@ class Profile extends React.Component {
 
     this.state = {
       userProfile: null, 
+      me: null, 
       turtles: [] 
     };
   }
 
   async choose(uid) {
     const opponent = (await getUserProfile(uid)).username;
-    const me = await getUserProfile(this.props.uid);
     let msg = `Which turtle do you want to duel ${opponent} with?\nChoose from: \n`;
-    if (!me.turtles) {
+    if (!this.state.me?.turtles) {
       alert('Turtles not loaded.');
       return null;
     }
-    for (const turtleClass in me.turtles) {
-      msg += `  ${me.turtles[turtleClass]}\n`;
+    for (const turtleClass in this.state.me.turtles) {
+      msg += `  ${this.state.me.turtles[turtleClass]}\n`;
     }
-    const selection = prompt(msg, me.turtles['Standard']);
-    for (const turtleClass in me.turtles) {
+    const selection = prompt(msg, this.state.me.turtles['Standard']);
+    for (const turtleClass in this.state.me.turtles) {
       console.log(selection);
-      if (selection === me.turtles[turtleClass]) {
+      if (selection === this.state.me.turtles[turtleClass]) {
         return (await getTurtleClass(turtleClass)).className;
       }
     }
@@ -118,6 +118,8 @@ class Profile extends React.Component {
     const d = new Date();
     const date = String(d.getDate()) + "/" + String(d.getMonth() + 1) + "/" + String(d.getFullYear());
     const profileRef = await getUserRef(this.props.viewing_uid);
+    const userMapRef = await doc(firestore, 'users/userMap');
+    this.userMap = (await getDoc(userMapRef)).data();
 
     let profile = await getDoc(profileRef);
     if (this.props.uid === this.props.viewing_uid){
@@ -137,16 +139,15 @@ class Profile extends React.Component {
           icon: "https://img.brickowl.com/files/image_cache/larger/lego-universe-bob-minifigure-25.jpg",
           requests: []
         });
-        const userMapRef = await doc(firestore, 'users/userMap');
-        const userMap = (await getDoc(userMapRef)).data();
-        userMap[this.props.email] = this.props.uid;
-        setDoc(userMapRef, userMap);
+        this.userMap[this.props.email] = this.props.uid;
+        setDoc(userMapRef, this.userMap);
         profile = await getDoc(profileRef);
       }
       
     }
     const userProfile = profile?.data();
-    this.setState({ userProfile: userProfile });
+    const me = await getUserProfile(this.props.uid);
+    this.setState({ userProfile: userProfile, me: me });
     
     // preprocess the turtles into {turtleClass, name} format
     if (userProfile.turtles) {
@@ -169,7 +170,7 @@ class Profile extends React.Component {
       // challege was accepted
       if (newProfile.requests.includes(newProfile.username)) {
         newProfile.requests = newProfile.requests.filter(request => request !== newProfile.username);
-        await updateDoc(userProfileRef, { requests: newProfile.requests, in_room: newProfile.username });
+        await updateDoc(userProfileRef, { requests: newProfile.requests, in_room: this.userMap[newProfile.username] });
         window.location.href = '/gameCycleRed';
       }
       if (this.props.uid === this.props.viewing_uid) {
@@ -201,12 +202,12 @@ class Profile extends React.Component {
             // accept challenge
             profile.requests = profile.requests.filter(request => request !== fromUser);
             const profileRef = await getUserRef(this.props.uid);
-            const turtle = await this.choose(this.props.viewing_uid);
+            const turtle = await this.choose(this.userMap[fromUser]);
             if (!turtle) {
               alert('Invalid turtle selection.');
               return;
             }
-            await updateDoc(profileRef, { requests: profile.requests, in_room: fromUser, using: turtle });
+            await updateDoc(profileRef, { requests: profile.requests, in_room: this.userMap[fromUser], using: turtle });
             this.setState({ userProfile: profile });
             await sendRequest(await getUIDByUsername(fromUser), await getUIDByUsername(fromUser));
             window.location.href = '/gameCycleBlue';
