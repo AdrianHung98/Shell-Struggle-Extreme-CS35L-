@@ -271,12 +271,12 @@ class SoloGameCycle extends React.Component {
         let playerDisplay =
             <div className="PlayerDisplay">
                 <Player
-                    user="Blue Player" playerColor={"Blue"}
+                    user="Red Player" playerColor={"Red"}
                     health={opponentHealth} maxHealth={bHP}
                     strength={bSTR} intelligence={bINT} image={bIMG}>
                 </Player>
                 <Player
-                    user="Red Player (You)" playerColor={"Red"}
+                    user="Blue Player (You)" playerColor={"Blue"}
                     health={playerHealth} maxHealth={rHP}
                     strength={rSTR} intelligence={rINT} image={rIMG}>
                 </Player>
