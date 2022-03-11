@@ -19,8 +19,6 @@
     margin: 0 auto;
     top: 50%;
     position: relative;
-    -ms-transform: translateY(-50%);
-    transform: translateY(-50%);
 }
 
 .GUI{

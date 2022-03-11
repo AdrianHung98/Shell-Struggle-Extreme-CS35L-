@@ -5,6 +5,18 @@ import { getUserProfile } from '../database';
 import Turtle from '../turtle';
 import { getTurtleClasses } from '../database';
 import './game-cycle.css';
+import '../turtle.css'
+import {
+  MDBCard, 
+  MDBCardBody, 
+  MDBCardFooter, 
+  MDBCardTitle, 
+  MDBCardImage, 
+  MDBContainer, 
+  MDBRow, 
+  MDBCol 
+} from 'mdb-react-ui-kit';
+import 'mdb-react-ui-kit/dist/css/mdb.min.css';
 
 // Reference Arrays
 const turtleClasses = ["Builder", "Chef", "Cupid", "Mewtwo", "Robot", "Standard", "Tank", "Wizard"];
@@ -15,22 +27,30 @@ var messagesArray = [" "];
 
 function AttackButton(props) {
     return(
-        <button className="attack" onClick={props.handleClick}>
+        <button className="attack btn bg-light ms-1 me-1" onClick={props.handleClick}>
             {props.attack}
         </button>
 );}
 
 function Player(props) {
-    return(
-        <div className="PlayerCard">
-            <div className="PlayerCardInternal" >
-                <div >{props.user}</div>
-                <Turtle id={props.playerColor} image={props.image}
-                health={props.health} maxHealth={props.maxHealth} intelligence={props.intelligence} strength={props.strength}>
-                </Turtle>
-            </div>
-        </div>
-);}
+  return (
+    <MDBCol lg={true} style={{marginBottom: '1.5rem'}} className='d-flex justify-content-center col-6'>
+      <MDBCard style={{ width: '18rem' }} className='h-100'>
+        <MDBCardImage position='top' src={props.image} />
+        <MDBCardBody>
+          <MDBCardTitle>{props.user} 
+          </MDBCardTitle>
+          <div className="HealthBar">
+            <div className="PercentageBar" style={{"visibility": props.health === 0 ? "hidden" : "visible","width": (100 * props.health / props.maxHealth).toString() + "%"}}></div>
+          </div>
+        </MDBCardBody>
+        <MDBCardFooter>
+          HP {props.health}/{props.maxHealth} / STR {props.strength} / INT {props.intelligence}
+        </MDBCardFooter>
+      </MDBCard>
+    </MDBCol>
+  );
+}
 
 class SoloGameCycle extends React.Component {
     constructor(props) {
@@ -61,9 +81,9 @@ class SoloGameCycle extends React.Component {
 
         // Get Player turtles
         const choice = turtleClasses[Math.floor(Math.random() * 8)];
-        this.setState({blueTurtle: choice.className});
+        this.setState({redTurtle: choice.className});
         const playerTurtle = (await getUserProfile(this.props.uid)).using;
-        this.setState({redTurtle: playerTurtle});
+        this.setState({blueTurtle: playerTurtle});
 
         const turtles = this.state.turtleClasses;
         const rTurt= this.classToIndex(this.state.blueTurtle);
@@ -95,25 +115,25 @@ class SoloGameCycle extends React.Component {
     // Clicked a button
     chooseMove(move) {
         this.setState(
-            {redMove: move,
+            {blueMove: move,
             hasChosen: true,
             loop: true
         });
         const turtles = this.state.turtleClasses;
-        const bTurt = this.classToIndex(this.state.blueTurtle);
-        const bSTR = turtles[bTurt].strength;
-        if (this.state.redHealth <= 40 + (40 * (bSTR / 30))) {
-            this.setState({blueMove: 2});
+        const rTurt = this.classToIndex(this.state.redTurtle);
+        const rSTR = turtles[rTurt].strength;
+        if (this.state.redHealth <= 40 + (40 * (rSTR / 30))) {
+            this.setState({redMove: 2});
         } else {
-            if (this.state.redHealth <= 70 + (70 * (bSTR / 30))) {
-                this.setState({blueMove: 1});
+            if (this.state.redHealth <= 70 + (70 * (rSTR / 30))) {
+                this.setState({redMove: 1});
             } else {
                 const coin = Math.floor(Math.random() * 2);
                 if (coin) {
-                    this.setState({blueMove: 3});
+                    this.setState({redMove: 3});
                 }
                 else
-                    this.setState({blueMove: 1});
+                    this.setState({redMove: 1});
             }
         }
     }
@@ -269,27 +289,36 @@ class SoloGameCycle extends React.Component {
 
         // Player Display
         let playerDisplay =
-            <div className="PlayerDisplay">
-                <Player
-                    user="Red Player" playerColor={"Red"}
-                    health={opponentHealth} maxHealth={bHP}
-                    strength={bSTR} intelligence={bINT} image={bIMG}>
-                </Player>
-                <Player
-                    user="Blue Player (You)" playerColor={"Blue"}
-                    health={playerHealth} maxHealth={rHP}
-                    strength={rSTR} intelligence={rINT} image={rIMG}>
-                </Player>
-            </div>;
+          <MDBContainer className='container-fluid'>
+            <MDBRow>
+              <Player
+                  user="Red Player (CPU)" playerColor={"Red"}
+                  health={opponentHealth} maxHealth={rHP}
+                  strength={rSTR} intelligence={rINT} image={rIMG}>
+              </Player>
+              <Player
+                  user="Blue Player (You)" playerColor={"Blue"}
+                  health={playerHealth} maxHealth={bHP}
+                  strength={bSTR} intelligence={bINT} image={bIMG}>
+              </Player>
+            </MDBRow>
+          </MDBContainer>;
+        var winnerColor = "none";
+        const winnerDeclared = (message === "Red Player Won!" || message === "Blue Player Won!");
+        if(winnerDeclared){
+            if(message === "Red Player Won!"){ winnerColor = "Red";}
+            else if(message === "Blue Player Won!"){winnerColor = "Blue";}
+        }
+        var renderOptionsID = (winnerDeclared) ? "invisible" : "";
+        let returnButton = (winnerDeclared) ? <button className="btn-primary" onClick={() => {window.location.href = `/profile/${this.props.uid}`;}}>Go back to profile</button> : <div id="invisible"></div>;
 
         // Move Selection
         let options;
         if (this.state.hasChosen || message === "Red Player Won!" 
             || message === "Blue Player Won!")
-            options = <div></div>
+            options = null;
         else {
-            options = <div>
-                Select a move:<br/>
+            options = <div className={renderOptionsID}>
                 <AttackButton attack="Shell Slam" handleClick={() => this.chooseMove(1)}/>
                 <AttackButton attack="Quick Snap" handleClick={() => this.chooseMove(2)}/>
                 <AttackButton attack="Show off a Cool Stick" handleClick={() => this.chooseMove(3)}/>
@@ -298,14 +327,21 @@ class SoloGameCycle extends React.Component {
 
         return (
             <div>
-                <h1>Shell Struggle EXTREME</h1>
-                    {playerDisplay}
-                <div className="GUI">
-                    <div className="BattleInterface">
-                        {message}
+                <h1 className="text-center">Shell Struggle EXTREME</h1>
+                <hr />
+                {playerDisplay}
+                {
+                  message && message.trim() !== "" || options ? 
+                    <MDBCard className="bg-dark BattleInterface">
+                      <MDBCardBody>
+                        <div className="text-white medium">{message}</div>
                         {options}
-                    </div>
-                </div>
+                        {returnButton}
+                      </MDBCardBody>
+                    </MDBCard>
+                  : 
+                  null 
+                }
             </div>
         );
     }

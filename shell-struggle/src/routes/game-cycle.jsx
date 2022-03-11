@@ -5,6 +5,17 @@ import { db } from '../firebase';
 import { off, ref, onValue, set } from "firebase/database"; 
 import { getUserProfile, incWallet } from '../database';
 import Turtle from '../turtle';
+import {
+  MDBCard, 
+  MDBCardBody, 
+  MDBCardFooter, 
+  MDBCardTitle, 
+  MDBCardImage, 
+  MDBContainer, 
+  MDBRow, 
+  MDBCol 
+} from 'mdb-react-ui-kit';
+import 'mdb-react-ui-kit/dist/css/mdb.min.css';
 import { getTurtleClasses } from '../database';
 import './game-cycle.css';
 
@@ -41,22 +52,30 @@ function setBlueCompleted(bool) { set(blueCompletedRef, bool); }
 
 function AttackButton(props) {
     return(
-        <button className="attack" onClick={props.handleClick}>
+        <button className="attack btn bg-light ms-1 me-1" onClick={props.handleClick}>
             {props.attack}
         </button>
 );}
 
 function Player(props) {
-    return(
-        <div className="PlayerCard">
-            <div className="PlayerCardInternal" >
-                <div >Player: {props.user} ({props.playerColor})</div>
-                <Turtle id={props.playerColor} image={props.image}
-                health={props.health} maxHealth={props.maxHealth} intelligence={props.intelligence} strength={props.strength}>
-                </Turtle>
-            </div>
-        </div>
-);}
+  return (
+    <MDBCol lg={true} style={{marginBottom: '1.5rem'}} className='d-flex justify-content-center col-6'>
+      <MDBCard style={{ width: '18rem' }} className='h-100'>
+        <MDBCardImage position='top' src={props.image} />
+        <MDBCardBody>
+          <MDBCardTitle>{props.user} 
+          </MDBCardTitle>
+          <div className="HealthBar">
+            <div className="PercentageBar" style={{"visibility": props.health === 0 ? "hidden" : "visible","width": (100 * props.health / props.maxHealth).toString() + "%"}}></div>
+          </div>
+        </MDBCardBody>
+        <MDBCardFooter>
+          HP {props.health}/{props.maxHealth} / STR {props.strength} / INT {props.intelligence}
+        </MDBCardFooter>
+      </MDBCard>
+    </MDBCol>
+  );
+}
 
 class GameCycle extends React.Component {
     constructor(props) {
@@ -373,36 +392,37 @@ class GameCycle extends React.Component {
         let playerDisplay;
         if (this.playerColor === "Red") {
             playerDisplay =
-            <div className="PlayerDisplay">
-                <Player
-                    user="Opponent" playerColor={"Blue"}
-                    health={opponentHealth} maxHealth={bHP}
-                    strength={bSTR} intelligence={bINT} image={bIMG}>
-                </Player>
-                <Player
-                    user="You" playerColor={"Red"}
-                    health={playerHealth} maxHealth={rHP}
-                    strength={rSTR} intelligence={rINT} image={rIMG}>
-                </Player>
-            </div>;
+              <MDBContainer className='container-fluid'>
+                <MDBRow>
+                  <Player
+                      user="You" playerColor={"Red"}
+                      health={playerHealth} maxHealth={rHP}
+                      strength={rSTR} intelligence={rINT} image={rIMG}>
+                  </Player>
+                  <Player
+                      user="Opponent" playerColor={"Blue"}
+                      health={opponentHealth} maxHealth={bHP}
+                      strength={bSTR} intelligence={bINT} image={bIMG}>
+                  </Player>
+                </MDBRow>
+              </MDBContainer>;
         } else {
             playerDisplay =
-                <div className="PlayerDisplay">
-                    <Player id="red"
-                        user="Opponent" playerColor={"Red"}
-                        health={opponentHealth} maxHealth={rHP} 
-                        strength={rSTR} intelligence={rINT} image={rIMG}
-                        >
-                    </Player>
-                    <Player id="blue"
-                        user="You" playerColor={"Blue"}
-                        health={playerHealth} maxHealth={bHP}
-                        strength={bSTR} intelligence={bINT} image={bIMG}>
-                    </Player>
-                </div>;
+              <MDBContainer className='container-fluid'>
+                <MDBRow>
+                  <Player
+                      user="Opponent" playerColor={"Red"}
+                      health={opponentHealth} maxHealth={rHP}
+                      strength={rSTR} intelligence={rINT} image={rIMG}>
+                  </Player>
+                  <Player
+                      user="You" playerColor={"Blue"}
+                      health={playerHealth} maxHealth={bHP}
+                      strength={bSTR} intelligence={bINT} image={bIMG}>
+                  </Player>
+                </MDBRow>
+              </MDBContainer>;
         }
-
-        console.log(message);
 
         //Winner winner chicken dinner
         var winnerColor = "none";
@@ -412,7 +432,7 @@ class GameCycle extends React.Component {
             else if(message === "Blue Player Won!"){winnerColor = "Blue";}
         }
         var renderOptionsID = (winnerDeclared) ? "invisible" : "";
-        let returnButton = (winnerDeclared) ? <button onClick={() => this.rewardWinner(winnerColor)}>Go back to profile</button> : <div id="invisible"></div>;
+        let returnButton = (winnerDeclared) ? <button className="btn-primary" onClick={() => this.rewardWinner(winnerColor)}>Go back to profile</button> : <div id="invisible"></div>;
 
         // Move Selection
         let options;
@@ -422,7 +442,6 @@ class GameCycle extends React.Component {
             options = <div></div>
         else {
             options = <div id={renderOptionsID}>
-                Select a move:<br/>
                 <AttackButton attack="Shell Slam" handleClick={() => this.chooseMove(1)}/>
                 <AttackButton attack="Quick Snap" handleClick={() => this.chooseMove(2)}/>
                 <AttackButton attack="Show off a Cool Stick" handleClick={() => this.chooseMove(3)}/>
@@ -431,15 +450,21 @@ class GameCycle extends React.Component {
 
         return (
             <div>
-                <h1>Shell Struggle EXTREME</h1>
-                    {playerDisplay}
-                <div className="GUI">
-                    <div className="BattleInterface">
-                        {message}
-                        {options}
-                        {returnButton}
-                    </div>
-                </div>
+              <h1>Shell Struggle EXTREME</h1>
+              <hr />
+              {playerDisplay}
+              {
+                message && message.trim() !== "" || options ? 
+                  <MDBCard className="bg-dark BattleInterface">
+                    <MDBCardBody>
+                      <div className="text-white medium">{message}</div>
+                      {options}
+                      {returnButton}
+                    </MDBCardBody>
+                  </MDBCard>
+                : 
+                null 
+              }
             </div>
         );
     }
