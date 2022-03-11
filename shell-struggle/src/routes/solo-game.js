@@ -35,7 +35,7 @@ function AttackButton(props) {
 function Player(props) {
   return (
     <MDBCol lg={true} style={{marginBottom: '1.5rem'}} className='d-flex justify-content-center col-6'>
-      <MDBCard style={{ width: '18rem' }} className='h-100'>
+      <MDBCard style={{ width: '18rem' }} className={'h-100 text-light ' + (props.playerColor === 'Red' ? 'bg-danger' : 'bg-primary')}>
         <MDBCardImage position='top' src={props.image} />
         <MDBCardBody>
           <MDBCardTitle>{props.user} 
