@@ -39,7 +39,7 @@ function make_card(turtleClass, isLocked, buttonFunction) {
         <MDBCardImage position='top' src={turtleClass.image} />
           <MDBCardBody>
             <MDBCardTitle>Class: {turtleClass.className}</MDBCardTitle>
-            <MDBCardText>HP {turtleClass.health} / STR {turtleClass.strength} / SPD {turtleClass.speed}</MDBCardText>
+            <MDBCardText>HP {turtleClass.health} / STR {turtleClass.strength} / INT {turtleClass.speed}</MDBCardText>
           </MDBCardBody>
           {price}
         </MDBCard>

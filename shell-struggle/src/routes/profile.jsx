@@ -43,7 +43,7 @@ function make_card(turtleClass, name, editable, renameCallback) {
           </MDBCardText>
         </MDBCardBody>
         <MDBCardFooter>
-          HP {turtleClass.health} / STR {turtleClass.strength} / SPD {turtleClass.speed}
+          HP {turtleClass.health} / STR {turtleClass.strength} / INT {turtleClass.speed}
         </MDBCardFooter>
       </MDBCard>
     </MDBCol>
