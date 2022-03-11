@@ -319,7 +319,7 @@ class GameCycle extends React.Component {
             return;
         }
         const message = messages[1];
-        if (message === "Red Player Won!" || message === "Blue Player Won") {
+        if (message === "Red Player Won!" || message === "Blue Player Won!") {
             this.setState({message: message});
         } else {
             this.setState({messages: messages.slice(1)});
@@ -401,6 +401,8 @@ class GameCycle extends React.Component {
                     </Player>
                 </div>;
         }
+
+        console.log(message);
 
         //Winner winner chicken dinner
         var winnerColor = "none";
