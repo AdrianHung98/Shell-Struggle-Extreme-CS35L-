@@ -29,7 +29,7 @@ function Turtle(props) {
                 
                         <div style={{"display" : "flex"}}>
                         <   div id="stat">HP: {props.health}/{props.maxHealth}</div>
-                            <div id="stat">INT: {props.intelligence}</div>
+                            <div id="stat">SPD: {props.intelligence}</div>
                             <div id="stat">STR: {props.strength}</div>
                             </div>
             </div>

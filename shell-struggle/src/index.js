@@ -4,7 +4,6 @@ import { BrowserRouter, Routes, Route} from 'react-router-dom';
 import { auth } from './firebase';
 import { onAuthStateChanged } from '@firebase/auth';
 import SignInScreen from './sign-in-screen';
-import App from './routes/select-screen';
 import GameCycle from './routes/game-cycle.jsx';
 import Bestiary from './routes/bestiary.jsx';
 import ProfileWrapper from './routes/profile.jsx';
@@ -22,11 +21,11 @@ onAuthStateChanged(auth, (user) => {
       <BrowserRouter>
         <Routes>
           <Route exact path="/" element={<ProfileWrapper viewing_uid={uid} uid={uid} email={email}/>}/>
-          <Route exact path="/select-screen" element={<App uid={uid} email={email}/>}/>
           <Route exact path="/bestiary" element={<Bestiary uid={uid}/>}/>
           <Route exact path="/profile/:viewing_uid" element={<ProfileWrapper uid={uid} email={email}/>}/>
-          <Route path="gameCycleRed" element={<GameCycle playerColor="Red" opponentColor="Blue" uid={uid}/>}/>
-          <Route path="gameCycleBlue" element={<GameCycle playerColor="Blue" opponentColor="Red" uid={uid}/>}/>
+          <Route path="gameCycleRed" element={<GameCycle playerColor="Red" opponentColor="Blue" uid={uid} com={false}/>}/>
+          <Route path="gameCycleBlue" element={<GameCycle playerColor="Blue" opponentColor="Red" uid={uid} com={false}/>}/>
+          <Route path="gameCycleCPU" element={<GameCycle playerColor="Red" opponentColor="Red" uid={uid}/>} com={true}/>
           <Route exact path="/shop"element={<Shop user={user}/>}/>
         </Routes>
       </BrowserRouter>,

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { db } from '../firebase';
-import { off, ref, onValue, set, remove } from "firebase/database"; 
+import { off, ref, onValue, set } from "firebase/database"; 
 import { getUserProfile } from '../database';
 import Turtle from '../turtle';
 import { getTurtleClasses } from '../database';
@@ -49,7 +49,7 @@ function AttackButton(props) {
 function Player(props) {
     return(
         <div className="PlayerCard">
-            <div>Player: {props.user} ({props.playerColor})</div>
+            <div>Player: {props.user} </div>
             <Turtle image={props.image}
             health={props.health} intelligence={props.intelligence} strength={props.strength}>
             </Turtle>
@@ -187,7 +187,9 @@ class GameCycle extends React.Component {
         off(blueHealthRef);
         off(redTurtleRef);
         off(blueTurtleRef);
-        remove(ref(db, this.props.room_id));
+        // This is a potential future memory leak, but
+        // for a low number of users, it should be innocuous
+        //remove(ref(db, this.props.room_id));
     }
 
     chooseMove(move) {
@@ -273,8 +275,8 @@ class GameCycle extends React.Component {
             }
         } else {
             if (speeds[redMove] + rINT > speeds[blueMove] + bINT) {
-                firstMove = () => this.attackRedPlayer(bSTR);
-                secondMove = () => this.attackBluePlayer(rSTR);
+                firstMove = () => this.attackBluePlayer(rSTR);
+                secondMove = () => this.attackRedPlayer(bSTR);
             } else {
                 firstMove = () => this.attackRedPlayer(bSTR);
                 secondMove = () => this.attackBluePlayer(rSTR);
@@ -360,12 +362,12 @@ class GameCycle extends React.Component {
             playerDisplay =
             <div>
                 <Player 
-                    user="Sample Opponent" playerColor={"Blue"}
+                    user="Blue Player" playerColor={"Blue"}
                     health={opponentHealth} maxHealth={bHP}
                     strength={bSTR} intelligence={bINT} image={bIMG}>
                 </Player><br/><br/><br/>
                 <Player
-                    user="Sample Player" playerColor={"Red"}
+                    user="Red Player (You)" playerColor={"Red"}
                     health={playerHealth} maxHealth={rHP}
                     strength={rSTR} intelligence={rINT} image={rIMG}>
                 </Player>
@@ -374,13 +376,13 @@ class GameCycle extends React.Component {
             playerDisplay =
                 <div>
                     <Player 
-                        user="Sample Opponent" playerColor={"Red"}
+                        user="Red Player" playerColor={"Red"}
                         health={opponentHealth} maxHealth={rHP} 
                         strength={rSTR} intelligence={rINT} image={rIMG}
                         >
                     </Player><br/><br/><br/>
                     <Player
-                        user="Sample Player" playerColor={"Blue"}
+                        user="Blue Player (You)" playerColor={"Blue"}
                         health={playerHealth} maxHealth={bHP}
                         strength={bSTR} intelligence={bINT} image={bIMG}>
                     </Player>
