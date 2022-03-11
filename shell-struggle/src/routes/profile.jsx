@@ -125,7 +125,7 @@ class Profile extends React.Component {
     if (this.props.uid === this.props.viewing_uid){
       if (profile.exists()) {
         if (newDateIsOneDayLater(profile.data().loginDate, date)) {
-          incWallet(this.user.uid, 100);
+          incWallet(this.props.uid, 100);
         }
         updateDoc(profileRef, {
           loginDate: date,
