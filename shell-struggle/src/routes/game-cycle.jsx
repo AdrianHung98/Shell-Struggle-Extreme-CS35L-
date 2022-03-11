@@ -11,6 +11,7 @@ import './game-cycle.css';
 // Reference Arrays
 const turtleClasses = ["Builder", "Chef", "Cupid", "Mewtwo", "Robot", "Standard", "Tank", "Wizard"];
 const moves = ["", "Shell Slam", "Quick Snap", "Show off a Cool Stick"];
+const speeds = [0, 7, 15, 9];
 
 // For later use in observers
 var messageRef;
@@ -58,8 +59,8 @@ class GameCycle extends React.Component {
         super(props);
         this.state = {
             message: null,
-            redMove: null,
-            blueMove: null,
+            redMove: "red",
+            blueMove: "blue",
             redHealth: 100,
             blueHealth: 100,
             redTurtle: null,
@@ -103,7 +104,13 @@ class GameCycle extends React.Component {
         redCompletedRef = ref(db, room_id + '/completed/red');
         blueCompletedRef = ref(db, room_id + '/completed/blue');
 
+        setRedMove(0);
+        setBlueMove(0);
+
         onValue(movesRef, (snapshot) => {
+            console.log("Snapshot", snapshot.val());
+            this.setState({blueMove: snapshot.val().blue});
+            this.setState({redMove: snapshot.val().red});
             this.handleMoveUpdate(snapshot);  
         });
 
@@ -146,15 +153,19 @@ class GameCycle extends React.Component {
             if (completed.red && completed.blue) {
                 setBlueCompleted(false);
                 setRedCompleted(false);
-                setRedMove(0);
-                setBlueMove(0);
                 this.setState({completed: false});
                 this.setState({hasChosen: false});
+
+                if (this.playerColor === "Red") {
+                    this.processMoves();
+                } else {return;}
+                
+                console.log("Got here???/");
+
+                setRedMove(0);
+                setBlueMove(0);
             }
         });
-
-        setRedMove(0);
-        setBlueMove(0);
     }
 
     // Stop tracking
@@ -188,12 +199,87 @@ class GameCycle extends React.Component {
                     setBlueCompleted(true);
             } else { return; }
         } catch { return; }
-        this.processMove(snapshot);
         this.setState({hasChosen: false});
         this.setState({completed: true});
     }
 
-    processMove(snapshot) {
+    translateMoveToDamage(move) {
+        let damage;
+        console.log("move:", move);
+        switch(move) {
+            case 1: damage = 70; break;
+            case 2: damage = 30; break;
+            case 3: damage = Math.floor(Math.random() * (100 - 1) + 1); break; 
+        }
+        return damage;
+    }
+
+    attackRedPlayer(strength) {
+        console.log(this.state.blueMove);
+        let damage = this.translateMoveToDamage(this.state.blueMove);
+        damage = damage + Math.floor(damage * (strength / 30));
+        let newHealth = this.state.redHealth - damage;
+        if (newHealth < 0)
+            newHealth = 0;
+        setRedHealth(newHealth);
+        this.setState({redHealth: newHealth});
+    }
+
+    attackBluePlayer(strength) {
+        let damage = this.translateMoveToDamage(this.state.redMove);
+        damage = Math.floor(damage * (strength / 30));
+        let newHealth = this.state.blueHealth - damage;
+        if (newHealth < 0)
+            newHealth = 0;
+        setBlueHealth(newHealth);
+        this.setState({blueHealth: newHealth});
+    }
+
+
+    processMoves() {
+        const turtles = this.state.turtleClasses;
+        const rTurt = this.classToIndex(this.state.redTurtle);
+        const bTurt = this.classToIndex(this.state.blueTurtle);
+        const rINT = turtles[rTurt].intelligence; const rSTR = turtles[rTurt].strength;
+        const bINT = turtles[bTurt].intelligence; const bSTR = turtles[bTurt].strength;
+
+        const redMove = this.state.redMove;
+        const blueMove = this.state.blueMove;
+
+        let firstMove;
+        let secondMove;
+        if (speeds[redMove] + rINT == speeds[blueMove] + bINT) {
+            let coin = Math.floor(Math.random());
+            if (coin) {
+                firstMove = this.attackRedPlayer;
+                secondMove = this.attackBluePlayer;
+            }
+        } else {
+            if (speeds[redMove] + rINT > speeds[blueMove] + bINT) {
+                firstMove = () => {this.attackBluePlayer(rSTR)};
+                secondMove = () => {this.attackRedPlayer(bSTR)};
+            } else {
+                firstMove = () => {this.attackRedPlayer(bSTR)};
+                secondMove = () => {this.attackBluePlayer(rSTR)};
+            }
+        }
+        firstMove();
+        if (this.state.redHealth <= 0) {
+            console.log("Blue Player Won");
+            return;
+        }
+        if  (this.state.blueHealth <= 0) {
+            console.log("Red Player Won");
+        }
+
+        secondMove();
+        if (this.state.redHealth <= 0) {
+            console.log("Blue Player Won");
+            return;
+        }
+        if  (this.state.blueHealth <= 0) {
+            console.log("Red Player Won");
+        }
 
     }
 
@@ -218,7 +304,6 @@ class GameCycle extends React.Component {
         if (this.state.redTurtle === null || this.state.blueTurtle === null)
             return(<div>Loading ... </div>);
         const turtles = this.state.turtleClasses;
-        console.log(turtles);
         const rTurt = this.classToIndex(this.state.redTurtle);
         const bTurt = this.classToIndex(this.state.blueTurtle);        
         const rSTR = turtles[rTurt].strength; const rINT = turtles[rTurt].intelligence;
