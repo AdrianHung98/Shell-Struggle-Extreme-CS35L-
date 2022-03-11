@@ -31,11 +31,11 @@ function computePrice(turtleClass){
 
 
 
-function make_card(userID, turtleClass, isLocked) {
+function make_card(turtleClass, isLocked, buttonFunction) {
     const price = isLocked ? <MDBCardFooter> Price: {computePrice(turtleClass)} <i className="fa fa-money" /></MDBCardFooter> : null;
     return (
-      <MDBCol lg={true} style={{marginBottom: '1.5rem'}} className='col-3' key={turtleClass.className} id="fitheight">
-        <MDBCard style={{ width: '18rem' }} className='h-100'>
+      <MDBCol lg={true} style={{marginBottom: '1.5rem'}} className='col-3' key={turtleClass.className}>
+        <MDBCard style={{ width: '18rem' }} className='h-100' onClick={buttonFunction}>
         <MDBCardImage position='top' src={turtleClass.image} />
           <MDBCardBody>
             <MDBCardTitle>Class: {turtleClass.className}</MDBCardTitle>
@@ -122,6 +122,9 @@ class Shop extends React.Component {
         }
     }
     
+    testing(){
+        console.log("clicked ");
+    }
 
     async componentDidMount(){
 
@@ -181,7 +184,7 @@ class Shop extends React.Component {
             <div>
                 <MDBContainer className="container-fluid">
                     <MDBRow>
-                    { this.state.unlockedCollection.map(turtle => <div key={turtle.className} id="flexchild">{make_card(this.state.user.uid, turtle,false)}</div>)}
+                    { this.state.unlockedCollection.map(turtle => make_card(turtle,false, ()=>{} ))}
                     </MDBRow>
                 </MDBContainer>
             </div>
@@ -190,7 +193,8 @@ class Shop extends React.Component {
             <div>
                 <MDBContainer className="container-fluid">
                     <MDBRow>
-                    { this.state.lockedCollection.map(turtle => <div id="flexchild" key={turtle.className} onClick={() => this.buyTurtle(turtle)}>{make_card(this.state.user.uid, turtle,true)}</div>)}
+                    { this.state.lockedCollection.map(turtle => make_card(turtle,true, () => this.buyTurtle(turtle))
+                                                        )}
                     </MDBRow>
                 </MDBContainer>
             </div>
