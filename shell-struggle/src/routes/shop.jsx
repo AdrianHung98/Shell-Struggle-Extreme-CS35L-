@@ -15,7 +15,6 @@ import {
 import './shop.css';
 import 'mdb-react-ui-kit/dist/css/mdb.min.css';
 import { incWallet, getUserProfile, unlockTurtle, getTurtles, getTurtleClasses, turtleClassCompare} from "../database";
-//import {img1, img2, img3, img4, img5, img6, img7, img8, turtleClasses} from './bestiary.jsx';
 import Navbar from '../navbar';
 
 

@@ -8,11 +8,13 @@ function Turtle(props) {
     const displayHealth = (percentage === 0)? "hidden": "visible";
     //don't display any health if no health
 
+    const borderStyle = "5px solid " + props.id;
+
     return(
         <div>
             <style>
             </style>
-            <div className="TurtleDisplay">            
+            <div className="TurtleDisplay" style={{"border": borderStyle}}>            
             <img 
                 src={props.image} 
                 width={imgWidth}
