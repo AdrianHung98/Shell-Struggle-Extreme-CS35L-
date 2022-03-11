@@ -294,7 +294,6 @@ class Profile extends React.Component {
                       : 
                         <button type="button" className="btn btn-primary flex-grow-1" onClick={ async () => {
                           const turtle = await this.choose(this.props.viewing_uid);
-                          console.log(turtle);
                           if (!turtle) {
                             alert('Invalid turtle selection.');
                             return;
