@@ -12,9 +12,9 @@ import {
   MDBCol 
 } from 'mdb-react-ui-kit';
 import 'mdb-react-ui-kit/dist/css/mdb.min.css'
-import { addTurtleClass, getTurtleClasses, resetTurtleClasses, turtleClassCompare } from '../database';
+import { getTurtleClasses, turtleClassCompare } from '../database';
+// import { resetTurtleClasses } from '../database';
 import Navbar from '../navbar';
-import { signInWithEmailLink } from '@firebase/auth';
 
 /**
  * see: 
