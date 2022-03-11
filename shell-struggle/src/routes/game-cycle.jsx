@@ -3,7 +3,7 @@
 import React from 'react';
 import { db } from '../firebase';
 import { off, ref, onValue, set } from "firebase/database"; 
-import { getUserProfile } from '../database';
+import { getUserProfile, incWallet } from '../database';
 import Turtle from '../turtle';
 import { getTurtleClasses } from '../database';
 import './game-cycle.css';
@@ -125,7 +125,7 @@ class GameCycle extends React.Component {
         onValue(messageRef, (snapshot) => {
             let messages = snapshot.val();
             this.setState({messages: messages});
-            this.setState({numMessages: messages.length});
+            this.setState({numMessages: messages.length -1});
         });
 
         onValue(redHealthRef, (snapshot) => {
@@ -321,13 +321,13 @@ class GameCycle extends React.Component {
     printMessage() {
         const messages = this.state.messages;
         if (messages.length === 1) { 
-            this.setState({message: messages[0]});
-            this.setState({numMessages: 1});
+            this.setState({message: messages[1]});
+            this.setState({numMessages: 0});
             return;
         }
-        const message = messages[0];
-        if (message === "Red Player Won!" || message === "Blue Player Won") {
-            this.setState({messages: message});
+        const message = messages[1];
+        if (message === "Red Player Won!" || message === "Blue Player Won!") {
+            this.setState({message: message});
         } else {
             this.setState({messages: messages.slice(1)});
         }
@@ -340,6 +340,17 @@ class GameCycle extends React.Component {
             if (turtleClasses[i] === class_name)
                 return i;
         }
+    }
+
+    //Reward winner with money and send em home
+    async rewardWinner(winnerColor){
+        if(winnerColor === "none"){ return;}
+
+        if(this.playerColor === winnerColor){
+            await incWallet(this.props.uid, 100);
+            alert("Congrats! You won $100!!");
+        }
+        window.location.href = `/profile/${this.props.uid}`;
     }
 
     render() {
@@ -371,12 +382,12 @@ class GameCycle extends React.Component {
             playerDisplay =
             <div className="PlayerDisplay">
                 <Player
-                    user="Sample Opponent" playerColor={"Blue"}
+                    user="Opponent" playerColor={"Blue"}
                     health={opponentHealth} maxHealth={bHP}
                     strength={bSTR} intelligence={bINT} image={bIMG}>
                 </Player>
                 <Player
-                    user="Red Player (You)" playerColor={"Red"}
+                    user="You" playerColor={"Red"}
                     health={playerHealth} maxHealth={rHP}
                     strength={rSTR} intelligence={rINT} image={rIMG}>
                 </Player>
@@ -385,27 +396,39 @@ class GameCycle extends React.Component {
             playerDisplay =
                 <div className="PlayerDisplay">
                     <Player id="red"
-                        user="Sample Opponent" playerColor={"Red"}
+                        user="Opponent" playerColor={"Red"}
                         health={opponentHealth} maxHealth={rHP} 
                         strength={rSTR} intelligence={rINT} image={rIMG}
                         >
                     </Player>
                     <Player id="blue"
-                        user="Sample Player" playerColor={"Blue"}
+                        user="You" playerColor={"Blue"}
                         health={playerHealth} maxHealth={bHP}
                         strength={bSTR} intelligence={bINT} image={bIMG}>
                     </Player>
                 </div>;
         }
 
+        console.log(message);
+
+        //Winner winner chicken dinner
+        var winnerColor = "none";
+        const winnerDeclared = (message === "Red Player Won!" || message === "Blue Player Won!");
+        if(winnerDeclared){
+            if(message === "Red Player Won!"){ winnerColor = "Red";}
+            else if(message === "Blue Player Won!"){winnerColor = "Blue";}
+        }
+        var renderOptionsID = (winnerDeclared) ? "invisible" : "";
+        let returnButton = (winnerDeclared) ? <button onClick={() => this.rewardWinner(winnerColor)}>Go back to profile</button> : <div id="invisible"></div>;
+
         // Move Selection
         let options;
         if (this.state.hasChosen || this.state.completed 
             || message === "Red Player Won!" || message === "Blue Player Won!"
-            || this.state.numMessages !== 1)
+            || this.state.numMessages !== 0)
             options = <div></div>
         else {
-            options = <div>
+            options = <div id={renderOptionsID}>
                 Select a move:<br/>
                 <AttackButton attack="Shell Slam" handleClick={() => this.chooseMove(1)}/>
                 <AttackButton attack="Quick Snap" handleClick={() => this.chooseMove(2)}/>
@@ -421,6 +444,7 @@ class GameCycle extends React.Component {
                     <div className="BattleInterface">
                         {message}
                         {options}
+                        {returnButton}
                     </div>
                 </div>
             </div>

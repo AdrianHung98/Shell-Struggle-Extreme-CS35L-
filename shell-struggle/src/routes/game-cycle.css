@@ -40,3 +40,8 @@
 #Red{
     border: 2px solid red;
 }
+
+#invisible{
+    height: 0;
+    visibility: hidden;
+}
