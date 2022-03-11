@@ -44,7 +44,7 @@ function make_card(turtleClass, name, editable, renameCallback) {
           </MDBCardText>
         </MDBCardBody>
         <MDBCardFooter>
-          HP {turtleClass.health} / STR {turtleClass.strength} / INT {turtleClass.intelligence}
+          HP {turtleClass.health} / STR {turtleClass.strength} / SPD {turtleClass.speed}
         </MDBCardFooter>
       </MDBCard>
     </MDBCol>
@@ -176,6 +176,9 @@ class Profile extends React.Component {
       if (this.props.uid === this.props.viewing_uid) {
         this.setState({ userProfile: doc.data() });
       }
+    });
+    const userMapListener = onSnapshot(userMapRef, async doc => {
+      this.userMap = doc.data();
     });
   }
   

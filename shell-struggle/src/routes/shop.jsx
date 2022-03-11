@@ -24,9 +24,10 @@ const default_ordering = ['Standard', 'Builder', 'Chef', 'Tank', 'Wizard', 'Cupi
 
 function computePrice(turtleClass){
     const health = 5;
-    const intelligence =6;
+    const intelligence = 6;
+    const speed = 6;
     const strength = 5;
-    return health*(turtleClass.health) + intelligence*(turtleClass.intelligence) + strength*(turtleClass.strength);
+    return health*(turtleClass.health) + speed*(turtleClass.speed) + strength*(turtleClass.strength);
 }
 
 
@@ -39,7 +40,7 @@ function make_card(turtleClass, isLocked, buttonFunction) {
         <MDBCardImage position='top' src={turtleClass.image} />
           <MDBCardBody>
             <MDBCardTitle>Class: {turtleClass.className}</MDBCardTitle>
-            <MDBCardText>HP {turtleClass.health} / STR {turtleClass.strength} / INT {turtleClass.intelligence}</MDBCardText>
+            <MDBCardText>HP {turtleClass.health} / STR {turtleClass.strength} / SPD {turtleClass.speed}</MDBCardText>
           </MDBCardBody>
           {price}
         </MDBCard>
