@@ -14,7 +14,7 @@ import {
   } from 'mdb-react-ui-kit';
 import './shop.css';
 import 'mdb-react-ui-kit/dist/css/mdb.min.css';
-import { incWallet, getUserProfile, unlockTurtle, getTurtles, getTurtleClasses} from "../database";
+import { incWallet, getUserProfile, unlockTurtle, getTurtles, getTurtleClasses, turtleClassCompare} from "../database";
 //import {img1, img2, img3, img4, img5, img6, img7, img8, turtleClasses} from './bestiary.jsx';
 import Navbar from '../navbar';
 
@@ -127,6 +127,7 @@ class Shop extends React.Component {
 
         
         const retrievedTurtleClasses = await getTurtleClasses();
+        retrievedTurtleClasses.sort(turtleClassCompare);
 
         const profile = await getUserProfile(this.state.user.uid);
         this.setState({
