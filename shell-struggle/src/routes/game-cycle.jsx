@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { db } from '../firebase';
-import { off, ref, onValue, set, remove } from "firebase/database"; 
+import { off, ref, onValue, set } from "firebase/database"; 
 import { getUserProfile } from '../database';
 import Turtle from '../turtle';
 import { getTurtleClasses } from '../database';
@@ -189,7 +189,9 @@ class GameCycle extends React.Component {
         off(blueHealthRef);
         off(redTurtleRef);
         off(blueTurtleRef);
-        remove(ref(db, this.props.room_id));
+        // This is a potential future memory leak, but
+        // for a low number of users, it should be innocuous
+        //remove(ref(db, this.props.room_id));
     }
 
     chooseMove(move) {
@@ -275,8 +277,8 @@ class GameCycle extends React.Component {
             }
         } else {
             if (speeds[redMove] + rINT > speeds[blueMove] + bINT) {
-                firstMove = () => this.attackRedPlayer(bSTR);
-                secondMove = () => this.attackBluePlayer(rSTR);
+                firstMove = () => this.attackBluePlayer(rSTR);
+                secondMove = () => this.attackRedPlayer(bSTR);
             } else {
                 firstMove = () => this.attackRedPlayer(bSTR);
                 secondMove = () => this.attackBluePlayer(rSTR);
@@ -367,7 +369,7 @@ class GameCycle extends React.Component {
                     strength={bSTR} intelligence={bINT} image={bIMG}>
                 </Player>
                 <Player
-                    user="Sample Player" playerColor={"Red"}
+                    user="Red Player (You)" playerColor={"Red"}
                     health={playerHealth} maxHealth={rHP}
                     strength={rSTR} intelligence={rINT} image={rIMG}>
                 </Player>
