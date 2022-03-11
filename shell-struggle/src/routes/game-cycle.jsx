@@ -125,7 +125,7 @@ class GameCycle extends React.Component {
         onValue(messageRef, (snapshot) => {
             let messages = snapshot.val();
             this.setState({messages: messages});
-            this.setState({numMessages: messages.length});
+            this.setState({numMessages: messages.length -1});
         });
 
         onValue(redHealthRef, (snapshot) => {
@@ -314,13 +314,13 @@ class GameCycle extends React.Component {
     printMessage() {
         const messages = this.state.messages;
         if (messages.length === 1) { 
-            this.setState({message: messages[0]});
-            this.setState({numMessages: 1});
+            this.setState({message: messages[1]});
+            this.setState({numMessages: 0});
             return;
         }
-        const message = messages[0];
+        const message = messages[1];
         if (message === "Red Player Won!" || message === "Blue Player Won") {
-            this.setState({messages: message});
+            this.setState({message: message});
         } else {
             this.setState({messages: messages.slice(1)});
         }
@@ -391,11 +391,13 @@ class GameCycle extends React.Component {
                 </div>;
         }
 
+        console.log("num", this.state.numMessages);
+        console.log("messages", this.state.messages);
         // Move Selection
         let options;
         if (this.state.hasChosen || this.state.completed 
             || message === "Red Player Won!" || message === "Blue Player Won!"
-            || this.state.numMessages !== 1)
+            || this.state.numMessages !== 0)
             options = <div></div>
         else {
             options = <div>
