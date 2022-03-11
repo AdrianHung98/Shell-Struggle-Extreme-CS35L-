@@ -177,6 +177,9 @@ class Profile extends React.Component {
         this.setState({ userProfile: doc.data() });
       }
     });
+    const userMapListener = onSnapshot(userMapRef, async doc => {
+      this.userMap = doc.data();
+    });
   }
   
   /**
