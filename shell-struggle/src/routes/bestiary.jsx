@@ -12,7 +12,7 @@ import {
   MDBCol 
 } from 'mdb-react-ui-kit';
 import 'mdb-react-ui-kit/dist/css/mdb.min.css'
-import { addTurtleClass, getTurtleClasses, resetTurtleClasses } from '../database';
+import { addTurtleClass, getTurtleClasses, resetTurtleClasses, turtleClassCompare } from '../database';
 import Navbar from '../navbar';
 import { signInWithEmailLink } from '@firebase/auth';
 
@@ -126,9 +126,7 @@ const turtleClasses = [
   } 
 ];
 
-function turtleClassCompare(turtleClass1, turtleClass2) {
-  return turtleClass1.id - turtleClass2.id;
-}
+
 
 function make_card(turtleClass) {
   return (
