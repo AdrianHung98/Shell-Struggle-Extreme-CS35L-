@@ -10,7 +10,7 @@ import './game-cycle.css';
 
 // Reference Arrays
 const turtleClasses = ["Builder", "Chef", "Cupid", "Mewtwo", "Robot", "Standard", "Tank", "Wizard"];
-const moves = ["Shell Slam", "Quick Snap", "Show off a Cool Stick"];
+const moves = ["", "Shell Slam", "Quick Snap", "Show off a Cool Stick"];
 
 // For later use in observers
 var messageRef;
@@ -45,7 +45,6 @@ function Player(props) {
             <Turtle image={props.image}
             health={props.health} intelligence={props.intelligence} strength={props.strength}>
             </Turtle>
-            
         </div>
 );}
 
@@ -96,8 +95,7 @@ class GameCycle extends React.Component {
         blueHealthRef = ref(db, room_id + '/blueHealth');
 
         onValue(movesRef, (snapshot) => {
-            this.processMoves(snapshot);
-            console.log(snapshot.val);   
+            this.processMoves(snapshot);  
         });
 
         onValue(messageRef, (snapshot) => {
@@ -122,6 +120,7 @@ class GameCycle extends React.Component {
 
             const rTurt = this.classToIndex(this.state.redTurtle);
             setRedHealth(150 + (5 * turtles[rTurt].health));
+            console.log("Success");
         });
 
         onValue(blueTurtleRef, (snapshot) => {
@@ -130,7 +129,11 @@ class GameCycle extends React.Component {
 
             const bTurt = this.classToIndex(this.state.blueTurtle);
             setBlueHealth(150 + (5 * turtles[bTurt].health));
+            console.log("Success");
         });
+
+        setRedMove(null);
+        setBlueMove(null);
     }
 
     // Stop tracking
@@ -141,7 +144,7 @@ class GameCycle extends React.Component {
         off(blueHealthRef);
         off(redTurtleRef);
         off(blueTurtleRef);
-        remove(ref(db, this.props.room_id));
+        // remove(ref(db, this.props.room_id));
     }
 
     chooseMove(move) {
@@ -154,11 +157,15 @@ class GameCycle extends React.Component {
     }
 
     processMoves(snapshot) {
-        console.log("Process Move", snapshot.val());
-    }
-
-    endTurn() {
-        console.log("End Turn");
+        const movesObject = snapshot.val();
+        try {
+            if (movesObject.blue && movesObject.red) {
+                console.log("Both Players played moves:", movesObject);
+                setRedMove(null);
+                setBlueMove(null);
+            } else { return; }
+        } catch { return; }
+        this.setState({hasChosen: false});
     }
 
     classToIndex(class_name) {
@@ -186,9 +193,9 @@ class GameCycle extends React.Component {
         const rTurt = this.classToIndex(this.state.redTurtle);
         const bTurt = this.classToIndex(this.state.blueTurtle);        
         const rSTR = turtles[rTurt].strength; const rINT = turtles[rTurt].intelligence;
-        const rIMG = turtles[rTurt].image; // const rHP = turtles[rTurt].health;
+        const rIMG = turtles[rTurt].image; const rHP = turtles[rTurt].health;
         const bSTR = turtles[bTurt].strength; const bINT = turtles[bTurt].intelligence;
-        const bIMG = turtles[bTurt].image; // const bHP = turtles[bTurt].health;
+        const bIMG = turtles[bTurt].image; const bHP = turtles[bTurt].health;
 
         // Player Display
         let playerDisplay;
@@ -197,12 +204,12 @@ class GameCycle extends React.Component {
             <div>
                 <Player 
                     user="Sample Opponent" playerColor={"Blue"}
-                    health={opponentHealth} // maxHealth={bHP}
+                    health={opponentHealth} maxHealth={bHP}
                     strength={bSTR} intelligence={bINT} image={bIMG}>
                 </Player>
                 <Player
                     user="Sample Player" playerColor={"Red"}
-                    health={playerHealth} // maxHealth={rHP}
+                    health={playerHealth} maxHealth={rHP}
                     strength={rSTR} intelligence={rINT} image={rIMG}>
                 </Player>
             </div>;
@@ -211,13 +218,13 @@ class GameCycle extends React.Component {
                 <div>
                     <Player 
                         user="Sample Opponent" playerColor={"Red"}
-                        health={opponentHealth} // maxHealth={rHP} 
+                        health={opponentHealth} maxHealth={rHP} 
                         strength={rSTR} intelligence={rINT} image={rIMG}
                         >
                     </Player>
                     <Player
                         user="Sample Player" playerColor={"Blue"}
-                        health={playerHealth} // maxHealth={bHP}
+                        health={playerHealth} maxHealth={bHP}
                         strength={bSTR} intelligence={bINT} image={bIMG}>
                     </Player>
                 </div>;
@@ -228,11 +235,11 @@ class GameCycle extends React.Component {
         if (this.state.hasChosen)
             options = <div></div>
         else {
-            options = 
-            <div>
-                <AttackButton attack="Shell Slam" handleClick={() => this.chooseMove(0)}/><br/>
-                <AttackButton attack="Quick Snap" handleClick={() => this.chooseMove(1)}/><br/>
-                <AttackButton attack="Show off a Cool Stick" handleClick={() => this.chooseMove(2)}/>
+            options = <div>
+                Select a move:<br/>
+                <AttackButton attack="Shell Slam" handleClick={() => this.chooseMove(1)}/><br/>
+                <AttackButton attack="Quick Snap" handleClick={() => this.chooseMove(2)}/><br/>
+                <AttackButton attack="Show off a Cool Stick" handleClick={() => this.chooseMove(3)}/>
             </div>
         }
 
@@ -240,7 +247,6 @@ class GameCycle extends React.Component {
             <div>
                 <h1>Shell Struggle EXTREME</h1>
                 {playerDisplay}
-                Select a move:
                 {options}
             </div>
         );
