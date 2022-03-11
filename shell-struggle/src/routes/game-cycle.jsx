@@ -49,10 +49,12 @@ function AttackButton(props) {
 function Player(props) {
     return(
         <div className="PlayerCard">
-            <div>Player: {props.user} </div>
-            <Turtle image={props.image}
-            health={props.health} intelligence={props.intelligence} strength={props.strength}>
-            </Turtle>
+            <div className="PlayerCardInternal" >
+                <div >Player: {props.user} ({props.playerColor})</div>
+                <Turtle id={props.playerColor} image={props.image}
+                health={props.health} maxHealth={props.maxHealth} intelligence={props.intelligence} strength={props.strength}>
+                </Turtle>
+            </div>
         </div>
 );}
 
@@ -394,12 +396,12 @@ class GameCycle extends React.Component {
         let playerDisplay;
         if (this.playerColor === "Red") {
             playerDisplay =
-            <div>
-                <Player 
-                    user="Blue Player" playerColor={"Blue"}
+            <div className="PlayerDisplay">
+                <Player
+                    user="Sample Opponent" playerColor={"Blue"}
                     health={opponentHealth} maxHealth={bHP}
                     strength={bSTR} intelligence={bINT} image={bIMG}>
-                </Player><br/><br/><br/>
+                </Player>
                 <Player
                     user="Red Player (You)" playerColor={"Red"}
                     health={playerHealth} maxHealth={rHP}
@@ -408,15 +410,15 @@ class GameCycle extends React.Component {
             </div>;
         } else {
             playerDisplay =
-                <div>
-                    <Player 
-                        user="Red Player" playerColor={"Red"}
+                <div className="PlayerDisplay">
+                    <Player id="red"
+                        user="Sample Opponent" playerColor={"Red"}
                         health={opponentHealth} maxHealth={rHP} 
                         strength={rSTR} intelligence={rINT} image={rIMG}
                         >
-                    </Player><br/><br/><br/>
-                    <Player
-                        user="Blue Player (You)" playerColor={"Blue"}
+                    </Player>
+                    <Player id="blue"
+                        user="Sample Player" playerColor={"Blue"}
                         health={playerHealth} maxHealth={bHP}
                         strength={bSTR} intelligence={bINT} image={bIMG}>
                     </Player>
@@ -432,8 +434,8 @@ class GameCycle extends React.Component {
         else {
             options = <div>
                 Select a move:<br/>
-                <AttackButton attack="Shell Slam" handleClick={() => this.chooseMove(1)}/><br/>
-                <AttackButton attack="Quick Snap" handleClick={() => this.chooseMove(2)}/><br/>
+                <AttackButton attack="Shell Slam" handleClick={() => this.chooseMove(1)}/>
+                <AttackButton attack="Quick Snap" handleClick={() => this.chooseMove(2)}/>
                 <AttackButton attack="Show off a Cool Stick" handleClick={() => this.chooseMove(3)}/>
             </div>
         }
@@ -441,9 +443,13 @@ class GameCycle extends React.Component {
         return (
             <div>
                 <h1>Shell Struggle EXTREME</h1>
-                {playerDisplay}
-                {message}
-                {options}
+                    {playerDisplay}
+                <div className="GUI">
+                    <div className="BattleInterface">
+                        {message}
+                        {options}
+                    </div>
+                </div>
             </div>
         );
     }

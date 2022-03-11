@@ -1,6 +1,42 @@
-
-
 .PlayerCard{
-    border: 2px;
+    width: 50%;
+    float: left;
 
+}
+
+.PlayerCardInternal{
+    width: fit-content;
+    margin: 0 auto;
+}
+
+.PlayerDisplay{
+    height: 450px;
+}
+
+.BattleInterface {
+    width: fit-content;
+    height: fit-content;
+    margin: 0 auto;
+    top: 50%;
+    position: relative;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+}
+
+.GUI{
+    border: 5px solid;
+    border-radius: 20px;
+    width: 50%;
+    height: 200px;
+    padding: 1%;
+    margin: 0 auto;
+    
+}
+
+#Blue{
+    border: 3px solid blue;
+}
+
+#Red{
+    border: 2px solid red;
 }
