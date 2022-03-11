@@ -3,7 +3,7 @@
 import React from 'react';
 import { getUserProfile } from '../database';
 import Turtle from '../turtle';
-import { getTurtleClasses } from '../database';
+import { getTurtleClasses, incWallet } from '../database';
 import './game-cycle.css';
 import '../turtle.css'
 import {
@@ -70,6 +70,7 @@ class SoloGameCycle extends React.Component {
             numMessages: 1,
             loop: true
         };
+        this.playerColor = "Blue";
     };
 
     // Track message, moves, and redIsNext in the realtime database
@@ -86,7 +87,7 @@ class SoloGameCycle extends React.Component {
         this.setState({blueTurtle: playerTurtle});
 
         const turtles = this.state.turtleClasses;
-        const rTurt= this.classToIndex(this.state.blueTurtle);
+        const rTurt= this.classToIndex(this.state.redTurtle);
         const bTurt = this.classToIndex(this.state.blueTurtle);
         const rMaxHealth = (150 + (5 * turtles[rTurt].health));
         const bMaxHealth = (150 + (5 * turtles[bTurt].health));
@@ -264,6 +265,17 @@ class SoloGameCycle extends React.Component {
         }
     }
 
+    //Reward winner with money and send em home
+    async rewardWinner(winnerColor){
+        if(winnerColor === "none"){ return;}
+
+        if(this.playerColor === winnerColor){
+            await incWallet(this.props.uid, 50);
+            alert("Congrats! You won $50!!");
+        }
+        window.location.href = `/profile/${this.props.uid}`;
+    }
+
     render() {
         const message = this.state.message;
 
@@ -310,7 +322,7 @@ class SoloGameCycle extends React.Component {
             else if(message === "Blue Player Won!"){winnerColor = "Blue";}
         }
         var renderOptionsID = (winnerDeclared) ? "invisible" : "";
-        let returnButton = (winnerDeclared) ? <button className="btn-primary" onClick={() => {window.location.href = `/profile/${this.props.uid}`;}}>Go back to profile</button> : <div id="invisible"></div>;
+        let returnButton = (winnerDeclared) ? <button className="btn-primary" onClick={() => this.rewardWinner(winnerColor)}>Go back to profile</button> : <div id="invisible"></div>;
 
         // Move Selection
         let options;
