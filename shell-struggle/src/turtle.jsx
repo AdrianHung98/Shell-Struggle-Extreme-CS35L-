@@ -16,7 +16,7 @@ function Turtle(props) {
             <img 
                 src={props.image} 
                 width={imgWidth}
-                height="300px%"
+                height={imgWidth}
                 alt=""
                 />
             <div>
@@ -24,10 +24,14 @@ function Turtle(props) {
                         <div className="HealthBar">
                             <div className="PercentageBar" style={{"visibility": displayHealth,"width": percentageWidth}}></div>
                         </div>
-                        <div style={{float: 'right'}}>{props.health}/{props.maxHealth}</div>
+                        
                         </div>
                 
-                <div style={{"display" : "flex"}}><div style={{"flex": 1}}>HP: {props.maxHealth}</div><div style={{"flex": 1}}>INT: {props.intelligence}</div><div style={{"flex": 1}}>STR: {props.strength}</div></div>
+                        <div style={{"display" : "flex"}}>
+                        <   div id="stat">HP: {props.health}/{props.maxHealth}</div>
+                            <div id="stat">INT: {props.intelligence}</div>
+                            <div id="stat">STR: {props.strength}</div>
+                            </div>
             </div>
             </div>
         </div>

@@ -5,6 +5,10 @@ async function addTurtleClass(turtleClass) {
   await setDoc(doc(firestore, 'turtleClasses', turtleClass.className), turtleClass);
 }
 
+function turtleClassCompare(turtleClass1, turtleClass2) {
+    return turtleClass1.id - turtleClass2.id;
+}
+
 async function getTurtleClasses() {
   const turtleClassesCollectionRef = collection(firestore, 'turtleClasses');
   const turtleClassesSnapshot = await getDocs(turtleClassesCollectionRef);
@@ -198,7 +202,7 @@ async function sendRequest(fromUID, toUID) {
 }
 
 export { 
-  addTurtleClass, getTurtleClass, getTurtleClasses, resetTurtleClasses,
+  addTurtleClass, getTurtleClass, turtleClassCompare, getTurtleClasses, resetTurtleClasses,
   getUserRef, getUserProfile, getUIDByUsername, 
   getTurtles, unlockTurtle, renameTurtle, resetUserTurtles, 
   getWallet, incWallet,

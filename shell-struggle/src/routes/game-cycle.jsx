@@ -218,6 +218,7 @@ class GameCycle extends React.Component {
         if (this.state.redTurtle === null || this.state.blueTurtle === null)
             return(<div>Loading ... </div>);
         const turtles = this.state.turtleClasses;
+        console.log(turtles);
         const rTurt = this.classToIndex(this.state.redTurtle);
         const bTurt = this.classToIndex(this.state.blueTurtle);        
         const rSTR = turtles[rTurt].strength; const rINT = turtles[rTurt].intelligence;
