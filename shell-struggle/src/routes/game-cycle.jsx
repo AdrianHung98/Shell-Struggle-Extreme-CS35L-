@@ -450,7 +450,7 @@ class GameCycle extends React.Component {
 
         return (
             <div>
-              <h1>Shell Struggle EXTREME</h1>
+              <h1 className="text-center">Shell Struggle EXTREME</h1>
               <hr />
               {playerDisplay}
               {
