@@ -11,7 +11,7 @@ import './game-cycle.css';
 // Reference Arrays
 const turtleClasses = ["Builder", "Chef", "Cupid", "Mewtwo", "Robot", "Standard", "Tank", "Wizard"];
 const moves = ["", "Shell Slam", "Quick Snap", "Show off a Cool Stick"];
-const speeds = [0, 15, 7, 9];
+const speeds = [0, 7, 15, 9];
 var messagesArray = [];
 
 
@@ -50,7 +50,7 @@ function Player(props) {
     return(
         <div className="PlayerCard">
             <div className="PlayerCardInternal" >
-                <div >{props.user}</div>
+                <div >Player: {props.user} ({props.playerColor})</div>
                 <Turtle id={props.playerColor} image={props.image}
                 health={props.health} maxHealth={props.maxHealth} intelligence={props.intelligence} strength={props.strength}>
                 </Turtle>
@@ -80,17 +80,12 @@ class GameCycle extends React.Component {
 
     playerColor = this.props.playerColor;
     opponentColor = this.props.opponentColor;
-    com = this.props.com;
 
     // Track message, moves, and redIsNext in the realtime database
     async componentDidMount() {
         // Get shared room ID
         const room_id = (await getUserProfile(this.props.uid)).in_room;
         this.setState({ room_id: room_id });
-
-        // Get entire turtle class
-        const turtleClasses = await getTurtleClasses();
-        this.setState({turtleClasses: turtleClasses});
 
         redTurtleRef = ref(db, room_id + '/redTurtle');
         blueTurtleRef = ref(db, room_id + '/blueTurtle');
@@ -100,6 +95,10 @@ class GameCycle extends React.Component {
             setRedTurtle(playerTurtle);
         else
             setBlueTurtle(playerTurtle);
+
+        // Get entire turtle class
+        const turtleClasses = await getTurtleClasses();
+        this.setState({turtleClasses: turtleClasses});
 
         messageRef = ref(db, room_id + '/message');
         movesRef = ref(db, room_id + '/moves');
@@ -118,6 +117,7 @@ class GameCycle extends React.Component {
         setMessage([""]);
 
         onValue(movesRef, (snapshot) => {
+            this.setState({blueMove: snapshot.val().blue});
             this.setState({redMove: snapshot.val().red});
             this.handleMoveUpdate(snapshot);  
         });
@@ -142,7 +142,6 @@ class GameCycle extends React.Component {
         onValue(redTurtleRef, (snapshot) => {
             let redTurtle = snapshot.val();
             this.setState({redTurtle: redTurtle});
-            if (!redTurtle) {return;}
 
             const rTurt = this.classToIndex(this.state.redTurtle);
             setRedHealth(150 + (5 * turtles[rTurt].health));
@@ -151,7 +150,6 @@ class GameCycle extends React.Component {
         onValue(blueTurtleRef, (snapshot) => {
             let blueTurtle = snapshot.val();
             this.setState({blueTurtle: blueTurtle});
-            if (!blueTurtle) {return;}
 
             const bTurt = this.classToIndex(this.state.blueTurtle);
             setBlueHealth(150 + (5 * turtles[bTurt].health));
@@ -161,6 +159,8 @@ class GameCycle extends React.Component {
         setRedCompleted(false);
         onValue(completedRef, (snapshot) => {
             let completed = snapshot.val();
+            if (this.playerColor === "Blue")
+                this.setState({completed: snapshot.val().blue});
             if (completed.red && completed.blue) {
                 this.setState({hasChosen: false});
 
@@ -189,18 +189,14 @@ class GameCycle extends React.Component {
         off(blueHealthRef);
         off(redTurtleRef);
         off(blueTurtleRef);
-        off(completedRef);
-        off(movesRef);
         // This is a potential future memory leak, but
         // for a low number of users, it should be innocuous
         //remove(ref(db, this.props.room_id));
     }
 
     chooseMove(move) {
-        if (this.playerColor === "Red") {
+        if (this.playerColor === "Red")
             setRedMove(move);
-            this.setState({redMove: move});
-        }
         else
             setBlueMove(move);
         this.setState({hasChosen: true});
@@ -212,9 +208,8 @@ class GameCycle extends React.Component {
             if (this.state.completed)
                 return;
             if (movesObject.blue && movesObject.red) {
-                if (this.playerColor === "Red") {
+                if (this.playerColor === "Red")
                     setRedCompleted(true);
-                }
                 else
                     setBlueCompleted(true);
             } else { return; }
@@ -259,8 +254,6 @@ class GameCycle extends React.Component {
     }
 
     processMoves() {
-        if (!this.state.redTurtle || !this.state.blueTurtle)
-            return;
         this.setState({completed: false});
         const turtles = this.state.turtleClasses;
         const rTurt = this.classToIndex(this.state.redTurtle);
@@ -274,13 +267,13 @@ class GameCycle extends React.Component {
         let firstMove;
         let secondMove;
         if (speeds[redMove] + rINT === speeds[blueMove] + bINT) {
-            let coin = Math.floor(Math.random() * 2);
+            let coin = Math.floor(Math.random());
             if (coin) {
                 firstMove = () => this.attackRedPlayer(bSTR);
                 secondMove = () => this.attackBluePlayer(rSTR);
             } else {
                 firstMove = () => this.attackRedPlayer(bSTR);
-                secondMove = () => this.attackBluePlayer(rSTR); 
+                secondMove = () => this.attackBluePlayer(bSTR); 
             }
         } else {
             if (speeds[redMove] + rINT > speeds[blueMove] + bINT) {

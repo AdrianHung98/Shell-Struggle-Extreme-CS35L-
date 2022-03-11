@@ -138,6 +138,7 @@ class SoloGameCycle extends React.Component {
             newHealth = 0;
         this.setState({redHealth: newHealth});
         messagesArray.push(`Blue Player attacked Red Player for ${damage} damage!`);
+        return newHealth;
     }
 
     attackBluePlayer(strength) {
@@ -148,6 +149,7 @@ class SoloGameCycle extends React.Component {
             newHealth = 0;
         this.setState({blueHealth: newHealth});
         messagesArray.push(`Red Player attacked Blue Player for ${damage} damage!`);
+        return newHealth;
     }
 
     processMoves() {
@@ -161,50 +163,56 @@ class SoloGameCycle extends React.Component {
         const blueMove = this.state.blueMove;
 
         let firstMove;
+        let firstPlayer;
         let secondMove;
+        let secondPlayer;
         if (speeds[redMove] + rINT === speeds[blueMove] + bINT) {
             let coin = Math.floor(Math.random() * 2);
             if (coin) {
                 firstMove = () => this.attackRedPlayer(bSTR);
+                firstPlayer = "Blue";
                 secondMove = () => this.attackBluePlayer(rSTR);
+                secondPlayer = "Red";
             } else {
-                firstMove = () => this.attackRedPlayer(bSTR);
-                secondMove = () => this.attackBluePlayer(rSTR); 
+                secondMove = () => this.attackRedPlayer(bSTR);
+                firstPlayer = "Blue";
+                firstMove = () => this.attackBluePlayer(rSTR);
+                secondPlayer = "Red";
             }
         } else {
             if (speeds[redMove] + rINT > speeds[blueMove] + bINT) {
                 firstMove = () => this.attackBluePlayer(rSTR);
+                firstPlayer = "Red";
                 secondMove = () => this.attackRedPlayer(bSTR);
+                secondPlayer = "Blue";
             } else {
                 firstMove = () => this.attackRedPlayer(bSTR);
+                firstPlayer = "Blue";
                 secondMove = () => this.attackBluePlayer(rSTR);
+                secondPlayer = "Red";
             }
         }
 
-        firstMove();
-        if (this.state.redHealth <= 0) { 
-            messagesArray.push("Blue Player Won!"); 
+        let newHealth = firstMove();
+        if (newHealth <= 0) { 
+            if (firstPlayer === "Red")
+                messagesArray.push("Red Player Won!");
+            else
+                messagesArray.push("Blue Player Won!");
             this.setState({messages: messagesArray});
             return; 
-        }
-        if (this.state.blueHealth <= 0) { 
-            messagesArray.push("Red Player Won!");
-            this.setState({messages: messagesArray});
-            return;
         }
 
-        secondMove();
-        if (this.state.redHealth <= 0) { 
-            messagesArray.push("Blue Player Won!"); 
-            this.setState({messages: messagesArray});
-            return;
-        }
-        if  (this.state.blueHealth <= 0) { 
-            messagesArray.push("Red Player Won!");
+        newHealth = secondMove();
+        if (newHealth <= 0) {
+            if (secondPlayer === "Red")
+                messagesArray.push("Red Player Won!");
+            else
+                messagesArray.push("Blue Player Won!");
             this.setState({messages: messagesArray});
             return; 
         }
-        messagesArray.push("        ");
+        messagesArray.push(" ");
         this.setState({messages: messagesArray});
     }
 
@@ -221,6 +229,7 @@ class SoloGameCycle extends React.Component {
         const message = messages[0];
         if (message === "Red Player Won!" || message === "Blue Player Won") {
             this.setState({messages: message});
+            this.setState({hasChosen: true});
         } else {
             this.setState({messages: messages.slice(1)});
         }
