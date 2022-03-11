@@ -125,6 +125,7 @@ class Profile extends React.Component {
       if (profile.exists()) {
         if (newDateIsOneDayLater(profile.data().loginDate, date)) {
           incWallet(this.props.uid, 100);
+          alert('You got a login bonus! Yayyy!');
         }
         updateDoc(profileRef, {
           loginDate: date,
