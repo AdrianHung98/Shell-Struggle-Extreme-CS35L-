@@ -21,6 +21,9 @@ var redHealthRef;
 var blueHealthRef;
 var redTurtleRef;
 var blueTurtleRef;
+var completedRef;
+var redCompletedRef;
+var blueCompletedRef;
 
 // Basic Setters
 function setRedMove(move) { set(redMoveRef, move); }
@@ -30,6 +33,8 @@ function setRedHealth(health) { set(redHealthRef, health); }
 function setBlueHealth(health) { set(blueHealthRef, health); }
 function setRedTurtle(class_name) { set(redTurtleRef, class_name); }
 function setBlueTurtle(class_name) { set(blueTurtleRef, class_name); }
+function setRedCompleted(bool) { set(redCompletedRef, bool); }
+function setBlueCompleted(bool) { set(blueCompletedRef, bool); }
 
 function AttackButton(props) {
     return(
@@ -61,7 +66,8 @@ class GameCycle extends React.Component {
             blueTurtle: null,
             room_id: null,
             turtleClasses: null,
-            hasChosen: false
+            hasChosen: false,
+            completed: false
         };
     };
 
@@ -93,9 +99,12 @@ class GameCycle extends React.Component {
         blueMoveRef = ref(db, room_id + '/moves/blue');
         redHealthRef = ref(db, room_id + '/redHealth');
         blueHealthRef = ref(db, room_id + '/blueHealth');
+        completedRef = ref(db, room_id + '/completed');
+        redCompletedRef = ref(db, room_id + '/completed/red');
+        blueCompletedRef = ref(db, room_id + '/completed/blue');
 
         onValue(movesRef, (snapshot) => {
-            this.processMoves(snapshot);  
+            this.handleMoveUpdate(snapshot);  
         });
 
         onValue(messageRef, (snapshot) => {
@@ -120,7 +129,6 @@ class GameCycle extends React.Component {
 
             const rTurt = this.classToIndex(this.state.redTurtle);
             setRedHealth(150 + (5 * turtles[rTurt].health));
-            console.log("Success");
         });
 
         onValue(blueTurtleRef, (snapshot) => {
@@ -129,11 +137,24 @@ class GameCycle extends React.Component {
 
             const bTurt = this.classToIndex(this.state.blueTurtle);
             setBlueHealth(150 + (5 * turtles[bTurt].health));
-            console.log("Success");
         });
 
-        setRedMove(null);
-        setBlueMove(null);
+        setBlueCompleted(false);
+        setRedCompleted(false);
+        onValue(completedRef, (snapshot) => {
+            let completed = snapshot.val();
+            if (completed.red && completed.blue) {
+                setBlueCompleted(false);
+                setRedCompleted(false);
+                setRedMove(0);
+                setBlueMove(0);
+                this.setState({completed: false});
+                this.setState({hasChosen: false});
+            }
+        });
+
+        setRedMove(0);
+        setBlueMove(0);
     }
 
     // Stop tracking
@@ -153,19 +174,27 @@ class GameCycle extends React.Component {
         else
             setBlueMove(move);
         this.setState({hasChosen: true});
-        console.log("Chose", moves[move]);
     }
 
-    processMoves(snapshot) {
+    handleMoveUpdate(snapshot) {
         const movesObject = snapshot.val();
         try {
+            if (this.state.completed)
+                return;
             if (movesObject.blue && movesObject.red) {
-                console.log("Both Players played moves:", movesObject);
-                setRedMove(null);
-                setBlueMove(null);
+                if (this.playerColor === "Red")
+                    setRedCompleted(true);
+                else
+                    setBlueCompleted(true);
             } else { return; }
         } catch { return; }
+        this.processMove(snapshot);
         this.setState({hasChosen: false});
+        this.setState({completed: true});
+    }
+
+    processMove(snapshot) {
+
     }
 
     classToIndex(class_name) {
