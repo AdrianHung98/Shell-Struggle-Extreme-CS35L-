@@ -89,8 +89,8 @@ class Profile extends React.Component {
   }
 
   async choose(uid) {
-    const opponent = (await getUserProfile(uid)).username;
-    let msg = `Which turtle do you want to duel ${opponent} with?\nChoose from: \n`;
+    const opponent = uid ? (await getUserProfile(uid)).username : 'CPU';
+    let msg = `With which turtle do you want to duel with ${opponent}?\nChoose from: \n`;
     if (!this.state.me?.turtles) {
       alert('Turtles not loaded.');
       return null;
@@ -100,7 +100,6 @@ class Profile extends React.Component {
     }
     const selection = prompt(msg, this.state.me.turtles['Standard']);
     for (const turtleClass in this.state.me.turtles) {
-      console.log(selection);
       if (selection === this.state.me.turtles[turtleClass]) {
         return (await getTurtleClass(turtleClass)).className;
       }
@@ -244,7 +243,9 @@ class Profile extends React.Component {
                 <div className="flex-grow-1 ms-3">
                   <h5 className="mb-1">{ this.state.userProfile?.username }</h5>
                   
-                  <p className="mb-0 pb-0" style={{ color: '#2b2a2a' }}>{ this.state.userProfile?.wallet } <i className="fa fa-money" /></p>
+                  <p className="mb-0 pb-0" style={{ color: '#2b2a2a' }}>{ this.state.userProfile?.wallet } <i className="fa fa-money" onClick={() => {
+                    window.location.href = '/select-screen';
+                  }}/></p>
                   <p className="mb-1 pb-1" style={{ color: '#2b2a2a' }}>{ this.state.userProfile?.turtles ? Object.keys(this.state.userProfile.turtles).length : '???' } Turtle{ this.state.userProfile?.turtles ? Object.keys(this.state.userProfile.turtles).length === 1 ? '' : 's' : '' } Collected</p>
                   <div className="d-flex pt-1">
                     {
@@ -269,7 +270,7 @@ class Profile extends React.Component {
                             this.setState({ userProfile: newUserProfile });
                           }}>Change Username</button>
 
-                          <button type="button" className="btn btn-primary flex-grow-1" onClick={async () => {
+                          <button type="button" className="btn btn-primary flex-grow-1 mb-1" onClick={async () => {
                             const profileRef = await getUserRef(this.props.uid);
                             const profile = (await getDoc(profileRef)).data();
                             const icon = prompt("Please enter the url for the new profile picture: ", profile.icon);
@@ -278,6 +279,17 @@ class Profile extends React.Component {
                             const newUserProfile = (await getDoc(profileRef)).data();
                             this.setState({ userProfile: newUserProfile });
                           }}>Change Profile Picture</button>
+
+                          <button type="button" className="btn btn-primary flex-grow-1 mb-1" onClick={async () => {
+                            const turtle = await this.choose(null);
+                            if (!turtle) {
+                              alert('Invalid turtle selection.');
+                              return;
+                            }
+                            const profileRef = await getUserRef(this.props.uid);
+                            await updateDoc(profileRef, { in_room: this.props.uid, using: turtle });
+                            window.location.href = '/gameCycleCPU';
+                          }}>Duel with CPU</button>
                         </div>
                       : 
                         <button type="button" className="btn btn-primary flex-grow-1" onClick={ async () => {

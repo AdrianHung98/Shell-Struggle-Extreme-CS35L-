@@ -18,7 +18,7 @@ function Navbar(props) {
         <div className="collapse navbar-collapse" id="navbar">
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <NavbarItem text="Home" to={`/profile/${props.uid}`} />
-            <NavbarItem text="Select Screen" to="/select-screen" />
+            {/* <NavbarItem text="Select Screen" to="/select-screen" /> */}
             <NavbarItem text="Bestiary" to="/bestiary" />
             <NavbarItem text="Shop" to="/shop" />
           </ul>
