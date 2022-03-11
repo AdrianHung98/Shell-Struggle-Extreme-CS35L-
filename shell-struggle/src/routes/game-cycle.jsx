@@ -12,6 +12,8 @@ import './game-cycle.css';
 const turtleClasses = ["Builder", "Chef", "Cupid", "Mewtwo", "Robot", "Standard", "Tank", "Wizard"];
 const moves = ["", "Shell Slam", "Quick Snap", "Show off a Cool Stick"];
 const speeds = [0, 7, 15, 9];
+var messagesArray = [];
+
 
 // For later use in observers
 var messageRef;
@@ -58,7 +60,8 @@ class GameCycle extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            message: null,
+            messages: [],
+            message: "",
             redMove: "red",
             blueMove: "blue",
             redHealth: 100,
@@ -68,7 +71,8 @@ class GameCycle extends React.Component {
             room_id: null,
             turtleClasses: null,
             hasChosen: false,
-            completed: false
+            completed: false,
+            numMessages: 1
         };
     };
 
@@ -106,17 +110,20 @@ class GameCycle extends React.Component {
 
         setRedMove(0);
         setBlueMove(0);
+        setRedCompleted(false);
+        setBlueCompleted(false);
+        setMessage([""]);
 
         onValue(movesRef, (snapshot) => {
-            console.log("Snapshot", snapshot.val());
             this.setState({blueMove: snapshot.val().blue});
             this.setState({redMove: snapshot.val().red});
             this.handleMoveUpdate(snapshot);  
         });
 
         onValue(messageRef, (snapshot) => {
-            let message = snapshot.val();
-            this.setState({message: message});
+            let messages = snapshot.val();
+            this.setState({messages: messages});
+            this.setState({numMessages: messages.length});
         });
 
         onValue(redHealthRef, (snapshot) => {
@@ -150,33 +157,37 @@ class GameCycle extends React.Component {
         setRedCompleted(false);
         onValue(completedRef, (snapshot) => {
             let completed = snapshot.val();
+            if (this.playerColor === "Blue")
+                this.setState({completed: snapshot.val().blue});
             if (completed.red && completed.blue) {
-                setBlueCompleted(false);
-                setRedCompleted(false);
-                this.setState({completed: false});
                 this.setState({hasChosen: false});
 
                 if (this.playerColor === "Red") {
                     this.processMoves();
                 } else {return;}
-                
-                console.log("Got here???/");
-
-                setRedMove(0);
-                setBlueMove(0);
+                setBlueCompleted(false);
+                setRedCompleted(false);
+                setRedMove(0); setBlueMove(0);
             }
         });
+
+        // Messages Timer
+        this.timerID = setInterval(
+            () => this.printMessage(), 
+            3000
+        );
     }
 
     // Stop tracking
     componentWillUnmount() {
+        clearInterval(this.timerID);
         off(messageRef);
         off(movesRef);
         off(redHealthRef);
         off(blueHealthRef);
         off(redTurtleRef);
         off(blueTurtleRef);
-        // remove(ref(db, this.props.room_id));
+        remove(ref(db, this.props.room_id));
     }
 
     chooseMove(move) {
@@ -201,42 +212,45 @@ class GameCycle extends React.Component {
         } catch { return; }
         this.setState({hasChosen: false});
         this.setState({completed: true});
+        messagesArray = [""];
     }
 
-    translateMoveToDamage(move) {
+    translateMoveToDamage(move, attackerColor) {
         let damage;
-        console.log("move:", move);
         switch(move) {
             case 1: damage = 70; break;
-            case 2: damage = 30; break;
+            case 2: damage = 40; break;
             case 3: damage = Math.floor(Math.random() * (100 - 1) + 1); break; 
+            default: damage = -1; break;
         }
+        messagesArray.push(`${attackerColor} Player used "${moves[move]}"`);
         return damage;
     }
 
     attackRedPlayer(strength) {
-        console.log(this.state.blueMove);
-        let damage = this.translateMoveToDamage(this.state.blueMove);
+        let damage = this.translateMoveToDamage(this.state.blueMove, "Blue");
         damage = damage + Math.floor(damage * (strength / 30));
         let newHealth = this.state.redHealth - damage;
         if (newHealth < 0)
             newHealth = 0;
         setRedHealth(newHealth);
         this.setState({redHealth: newHealth});
+        messagesArray.push(`Blue Player attacked Red Player for ${damage} damage!`);
     }
 
     attackBluePlayer(strength) {
-        let damage = this.translateMoveToDamage(this.state.redMove);
-        damage = Math.floor(damage * (strength / 30));
+        let damage = this.translateMoveToDamage(this.state.redMove, "Red");
+        damage = damage + Math.floor(damage * (strength / 30));
         let newHealth = this.state.blueHealth - damage;
         if (newHealth < 0)
             newHealth = 0;
         setBlueHealth(newHealth);
         this.setState({blueHealth: newHealth});
+        messagesArray.push(`Red Player attacked Blue Player for ${damage} damage!`);
     }
 
-
     processMoves() {
+        this.setState({completed: false});
         const turtles = this.state.turtleClasses;
         const rTurt = this.classToIndex(this.state.redTurtle);
         const bTurt = this.classToIndex(this.state.blueTurtle);
@@ -248,39 +262,66 @@ class GameCycle extends React.Component {
 
         let firstMove;
         let secondMove;
-        if (speeds[redMove] + rINT == speeds[blueMove] + bINT) {
+        if (speeds[redMove] + rINT === speeds[blueMove] + bINT) {
             let coin = Math.floor(Math.random());
             if (coin) {
-                firstMove = this.attackRedPlayer;
-                secondMove = this.attackBluePlayer;
+                firstMove = () => this.attackRedPlayer(bSTR);
+                secondMove = () => this.attackBluePlayer(rSTR);
+            } else {
+                firstMove = () => this.attackRedPlayer(bSTR);
+                secondMove = () => this.attackBluePlayer(bSTR); 
             }
         } else {
             if (speeds[redMove] + rINT > speeds[blueMove] + bINT) {
-                firstMove = () => {this.attackBluePlayer(rSTR)};
-                secondMove = () => {this.attackRedPlayer(bSTR)};
+                firstMove = () => this.attackRedPlayer(bSTR);
+                secondMove = () => this.attackBluePlayer(rSTR);
             } else {
-                firstMove = () => {this.attackRedPlayer(bSTR)};
-                secondMove = () => {this.attackBluePlayer(rSTR)};
+                firstMove = () => this.attackRedPlayer(bSTR);
+                secondMove = () => this.attackBluePlayer(rSTR);
             }
         }
+
         firstMove();
-        if (this.state.redHealth <= 0) {
-            console.log("Blue Player Won");
-            return;
+        if (this.state.redHealth <= 0) { 
+            messagesArray.push("Blue Player Won!"); 
+            setMessage(messagesArray);
+            return; 
         }
-        if  (this.state.blueHealth <= 0) {
-            console.log("Red Player Won");
+        if (this.state.blueHealth <= 0) { 
+            messagesArray.push("Red Player Won!");
+            setMessage(messagesArray);
+            return;
         }
 
         secondMove();
-        if (this.state.redHealth <= 0) {
-            console.log("Blue Player Won");
+        if (this.state.redHealth <= 0) { 
+            messagesArray.push("Blue Player Won!"); 
+            setMessage(messagesArray);
             return;
         }
-        if  (this.state.blueHealth <= 0) {
-            console.log("Red Player Won");
+        if  (this.state.blueHealth <= 0) { 
+            messagesArray.push("Red Player Won!");
+            setMessage(messagesArray);
+            return; 
         }
+        setMessage(messagesArray);
+    }
 
+    printMessage() {
+        const messages = this.state.messages;
+        if (messages.length === 1) { 
+            this.setState({message: messages[0]});
+            this.setState({numMessages: 1});
+            return;
+        }
+        const message = messages[0];
+        if (message === "Red Player Won!" || message === "Blue Player Won") {
+            this.setState({messages: message});
+        } else {
+            this.setState({messages: messages.slice(1)});
+        }
+        this.setState({message: message});
+        this.setState({numMessages: messages.length});
     }
 
     classToIndex(class_name) {
@@ -291,6 +332,8 @@ class GameCycle extends React.Component {
     }
 
     render() {
+        const message = this.state.message;
+
         // Health Display
         let playerHealth;
         let opponentHealth;
@@ -307,9 +350,9 @@ class GameCycle extends React.Component {
         const rTurt = this.classToIndex(this.state.redTurtle);
         const bTurt = this.classToIndex(this.state.blueTurtle);        
         const rSTR = turtles[rTurt].strength; const rINT = turtles[rTurt].intelligence;
-        const rIMG = turtles[rTurt].image; const rHP = turtles[rTurt].health;
+        const rIMG = turtles[rTurt].image; const rHP = 150 + (5 * turtles[rTurt].health);
         const bSTR = turtles[bTurt].strength; const bINT = turtles[bTurt].intelligence;
-        const bIMG = turtles[bTurt].image; const bHP = turtles[bTurt].health;
+        const bIMG = turtles[bTurt].image; const bHP = 150 + (5 * turtles[bTurt].health);
 
         // Player Display
         let playerDisplay;
@@ -320,7 +363,7 @@ class GameCycle extends React.Component {
                     user="Sample Opponent" playerColor={"Blue"}
                     health={opponentHealth} maxHealth={bHP}
                     strength={bSTR} intelligence={bINT} image={bIMG}>
-                </Player>
+                </Player><br/><br/><br/>
                 <Player
                     user="Sample Player" playerColor={"Red"}
                     health={playerHealth} maxHealth={rHP}
@@ -335,7 +378,7 @@ class GameCycle extends React.Component {
                         health={opponentHealth} maxHealth={rHP} 
                         strength={rSTR} intelligence={rINT} image={rIMG}
                         >
-                    </Player>
+                    </Player><br/><br/><br/>
                     <Player
                         user="Sample Player" playerColor={"Blue"}
                         health={playerHealth} maxHealth={bHP}
@@ -346,7 +389,9 @@ class GameCycle extends React.Component {
 
         // Move Selection
         let options;
-        if (this.state.hasChosen)
+        if (this.state.hasChosen || this.state.completed 
+            || message === "Red Player Won!" || message === "Blue Player Won!"
+            || this.state.numMessages !== 1)
             options = <div></div>
         else {
             options = <div>
@@ -361,6 +406,7 @@ class GameCycle extends React.Component {
             <div>
                 <h1>Shell Struggle EXTREME</h1>
                 {playerDisplay}
+                {message}
                 {options}
             </div>
         );
